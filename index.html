@@ -1,0 +1,1354 @@
+<!DOCTYPE html>
+
+<html lang="ja">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>STUDY OS</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&family=Noto+Sans+JP:wght@300;400;500&display=swap');
+:root{
+  --bg:#0a0c10;--bg1:#0f1218;--bg2:#141820;--bg3:#1c2230;
+  --bd:#1e2a3a;--bdB:#2a3d56;
+  --cy:#00d4ff;--cyD:rgba(0,212,255,.13);--cyG:rgba(0,212,255,.4);
+  --gn:#00ff9d;--gnD:rgba(0,255,157,.11);
+  --or:#ff6b2b;--orD:rgba(255,107,43,.14);
+  --yw:#ffd166;--pu:#a78bfa;--pk:#f472b6;
+  --tx:#c8d8e8;--txD:#4a6070;--txB:#e8f4ff;
+  --mono:'Share Tech Mono',monospace;--sans:'Noto Sans JP',sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:var(--sans);background:var(--bg);color:var(--tx);min-height:100vh;overflow-x:hidden}
+body::before{content:'';position:fixed;inset:0;background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,.07) 2px,rgba(0,0,0,.07) 4px);pointer-events:none;z-index:9999}
+nav{display:flex;align-items:center;background:var(--bg1);border-bottom:1px solid var(--bd);position:sticky;top:0;z-index:200;height:48px}
+.nav-logo{font-family:var(--mono);font-size:.9rem;color:var(--cy);letter-spacing:.18em;text-shadow:0 0 10px var(--cyG);padding:0 16px;border-right:1px solid var(--bd);height:100%;display:flex;align-items:center;flex-shrink:0}
+.nav-logo span{color:var(--txD)}
+.nav-tabs{display:flex;flex:1;height:100%;overflow-x:auto}
+.ntab{font-family:var(--mono);font-size:.62rem;letter-spacing:.1em;color:var(--txD);padding:0 14px;height:100%;display:flex;align-items:center;cursor:pointer;border-right:1px solid var(--bd);border-bottom:2px solid transparent;transition:all .15s;user-select:none;white-space:nowrap;flex-shrink:0}
+.ntab:hover{color:var(--cy);background:var(--cyD)}
+.ntab.on{color:var(--cy);border-bottom-color:var(--cy);background:var(--cyD)}
+.nav-r{display:flex;align-items:center;gap:8px;padding:0 12px;margin-left:auto;flex-shrink:0}
+.nav-clock{font-family:var(--mono);font-size:.59rem;color:var(--txD);white-space:nowrap}
+.sdot{width:7px;height:7px;border-radius:50%;background:var(--gn);box-shadow:0 0 5px var(--gn);animation:blink 2s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.3}}
+.page{display:none;padding:20px 22px;max-width:1120px;margin:0 auto}
+.page.on{display:block}
+.stitle{font-family:var(--mono);font-size:.6rem;color:var(--txD);letter-spacing:.25em;display:flex;align-items:center;gap:8px;margin-bottom:13px}
+.stitle::before{content:'';width:3px;height:10px;background:var(--cy);box-shadow:0 0 6px var(--cyG);flex-shrink:0}
+.card{background:var(--bg1);border:1px solid var(--bd);border-radius:3px;padding:17px;position:relative;overflow:hidden}
+.card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(--bdB),transparent)}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:11px}
+.flbl{font-family:var(--mono);font-size:.58rem;color:var(--txD);letter-spacing:.07em;margin-bottom:3px}
+.inp{background:var(--bg2);border:1px solid var(--bdB);color:var(--tx);font-family:var(--mono);font-size:.7rem;padding:6px 9px;outline:none;border-radius:2px;transition:border-color .2s;width:100%}
+.inp:focus{border-color:var(--cy)}
+.inp::placeholder{color:var(--txD)}
+select.inp{cursor:pointer}
+.btn{font-family:var(--mono);font-size:.63rem;letter-spacing:.09em;padding:6px 12px;border:1px solid;border-radius:2px;cursor:pointer;transition:all .15s;white-space:nowrap;flex-shrink:0}
+.bc{border-color:var(--cy);color:var(--cy);background:transparent}.bc:hover{background:var(--cyD)}
+.bg{border-color:var(--gn);color:var(--gn);background:transparent}.bg:hover{background:var(--gnD)}
+.bo{border-color:var(--or);color:var(--or);background:transparent}.bo:hover{background:var(--orD)}
+.bd2{border-color:var(--bdB);color:var(--txD);background:transparent}.bd2:hover{border-color:var(--txD);color:var(--tx)}
+.bdanger{border-color:#c0392b;color:#c0392b;background:transparent}.bdanger:hover{background:rgba(192,57,43,.12)}
+.brow{display:flex;gap:7px;justify-content:center;flex-wrap:wrap}
+.track{height:3px;background:var(--bg3);border-radius:2px;overflow:hidden}
+.tfill{height:100%;background:linear-gradient(90deg,var(--cy),var(--gn));border-radius:2px;transition:width .5s;box-shadow:0 0 5px var(--cyG)}
+.sbox{background:var(--bg2);border:1px solid var(--bd);border-radius:2px;padding:10px 7px;text-align:center;position:relative;overflow:hidden}
+.sbox::after{content:'';position:absolute;bottom:0;left:0;right:0;height:2px;background:var(--cy);opacity:.35}
+.sval{font-family:var(--mono);font-size:1.3rem;color:var(--cy);text-shadow:0 0 7px var(--cyG)}
+.slbl{font-size:.58rem;color:var(--txD);margin-top:2px;letter-spacing:.04em}
+.divider{height:1px;background:var(--bd);margin:13px 0}
+
+/* HOME */
+.home-wrap{min-height:calc(100vh - 48px);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:36px 24px}
+.home-hero{text-align:center;margin-bottom:48px}
+.home-logo{font-family:var(–mono);font-size:2.8rem;color:var(–cy);letter-spacing:.2em;text-shadow:0 0 28px var(–cyG),0 0 56px rgba(0,212,255,.14);line-height:1}
+.home-logo span{color:var(–txD)}
+.home-sub{font-family:var(–mono);font-size:.65rem;color:var(–txD);letter-spacing:.22em;margin-top:10px}
+.home-date-disp{font-family:var(–mono);font-size:.7rem;color:var(–cy);margin-top:14px;letter-spacing:.1em}
+.home-cards{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;width:100%;max-width:880px;margin-bottom:40px}
+.hcard{background:var(–bg1);border:1px solid var(–bd);border-radius:4px;padding:26px 20px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden;text-align:center}
+.hcard::before{content:’’;position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(–bdB),transparent)}
+.hcard::after{content:’’;position:absolute;inset:0;opacity:0;transition:opacity .2s;border-radius:4px;pointer-events:none}
+.hcard:hover{transform:translateY(-3px);box-shadow:0 10px 36px rgba(0,0,0,.45)}
+.hcard:hover::after{opacity:1}
+.hc-timer:hover{border-color:var(–cy)}.hc-timer::after{background:radial-gradient(ellipse at top,rgba(0,212,255,.07),transparent 70%)}
+.hc-books:hover{border-color:var(–gn)}.hc-books::after{background:radial-gradient(ellipse at top,rgba(0,255,157,.06),transparent 70%)}
+.hc-cal:hover{border-color:var(–yw)}.hc-cal::after{background:radial-gradient(ellipse at top,rgba(255,209,102,.06),transparent 70%)}
+.hc-exam:hover{border-color:var(–pu)}.hc-exam::after{background:radial-gradient(ellipse at top,rgba(167,139,250,.07),transparent 70%)}
+.hc-stats:hover{border-color:var(–or)}.hc-stats::after{background:radial-gradient(ellipse at top,rgba(255,107,43,.06),transparent 70%)}
+.hc-other:hover{border-color:var(–txD)}.hc-other::after{background:radial-gradient(ellipse at top,rgba(200,216,232,.04),transparent 70%)}
+.hcard-icon{font-size:1.9rem;margin-bottom:11px;display:block;position:relative;z-index:1}
+.hcard-name{font-family:var(–mono);font-size:.7rem;letter-spacing:.18em;color:var(–txB);margin-bottom:5px;position:relative;z-index:1}
+.hcard-desc{font-size:.69rem;color:var(–txD);line-height:1.55;position:relative;z-index:1}
+.hcard-accent{position:absolute;top:10px;right:10px;font-family:var(–mono);font-size:.54rem;padding:2px 7px;border-radius:10px;border:1px solid;letter-spacing:.06em;z-index:1}
+.home-stats{display:flex;gap:0;justify-content:center;background:var(–bg1);border:1px solid var(–bd);border-radius:4px;overflow:hidden;width:100%;max-width:800px}
+.hstat{flex:1;padding:16px 10px;text-align:center;border-right:1px solid var(–bd)}
+.hstat:last-child{border-right:none}
+.hstat-val{font-family:var(–mono);font-size:1.3rem;color:var(–cy);text-shadow:0 0 7px var(–cyG);display:block}
+.hstat-lbl{font-family:var(–mono);font-size:.56rem;color:var(–txD);letter-spacing:.1em;margin-top:3px}
+
+/* TIMER */
+.timer-layout{display:grid;grid-template-columns:280px 1fr;gap:14px}
+.ring-wrap{display:flex;justify-content:center;align-items:center;margin:5px 0 11px;position:relative}
+.ring-svg{transform:rotate(-90deg)}
+.ring-bg{fill:none;stroke:var(–bg3);stroke-width:4}
+.ring-prog{fill:none;stroke:var(–cy);stroke-width:4;stroke-linecap:round;stroke-dasharray:471;stroke-dashoffset:0;transition:stroke-dashoffset 1s linear;filter:drop-shadow(0 0 6px var(–cy))}
+.ring-prog.brk{stroke:var(–gn);filter:drop-shadow(0 0 6px var(–gn))}
+.ring-in{position:absolute;text-align:center}
+.rdig{font-family:var(–mono);font-size:2.2rem;color:var(–txB);text-shadow:0 0 14px var(–cyG)}
+.rphase{font-family:var(–mono);font-size:.56rem;color:var(–cy);letter-spacing:.24em;margin-top:3px}
+.pdots{display:flex;gap:5px;justify-content:center;margin:7px 0}
+.pdot{width:7px;height:7px;border-radius:50%;background:var(–bg3);border:1px solid var(–bdB);transition:all .3s}
+.pdot.done{background:var(–or);border-color:var(–or);box-shadow:0 0 4px var(–or)}
+.pdot.cur{background:var(–cy);border-color:var(–cy);box-shadow:0 0 5px var(–cy);animation:blink 1s infinite}
+.run-ind{display:none;align-items:center;gap:5px;font-family:var(–mono);font-size:.59rem;color:var(–gn);margin-top:7px;justify-content:center}
+.run-ind.on{display:flex}
+.rdot{width:6px;height:6px;border-radius:50%;background:var(–gn);animation:blink .8s infinite}
+.loglist{list-style:none;max-height:180px;overflow-y:auto}
+.logi{display:flex;justify-content:space-between;align-items:center;padding:4px 0;border-bottom:1px solid var(–bd);font-family:var(–mono);font-size:.61rem}
+.logi-book{color:var(–cy);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:150px}
+.logi-meta{color:var(–txD);flex-shrink:0;margin-left:7px}
+
+/* BOOKS */
+.books-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:13px}
+.bcard{background:var(–bg1);border:1px solid var(–bd);border-radius:3px;overflow:hidden;transition:border-color .2s}
+.bcard:hover{border-color:var(–bdB)}
+.bcard-hd{display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-bottom:1px solid var(–bd);background:var(–bg2)}
+.bcard-title{font-size:.79rem;font-weight:500;color:var(–txB);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex:1}
+.bcard-tag{font-family:var(–mono);font-size:.55rem;padding:2px 6px;border-radius:10px;border:1px solid var(–bdB);color:var(–txD);margin-left:7px;flex-shrink:0}
+.bcard-body{padding:12px}
+.bstats{display:grid;grid-template-columns:1fr 1fr 1fr;gap:6px;margin-bottom:10px}
+.bstat{text-align:center;background:var(–bg3);border-radius:2px;padding:6px 4px}
+.bstat-v{font-family:var(–mono);font-size:.92rem;color:var(–cy)}
+.bstat-l{font-size:.55rem;color:var(–txD);margin-top:2px}
+.bprog-wrap{margin-bottom:9px}
+.bprog-lbl{display:flex;justify-content:space-between;font-family:var(–mono);font-size:.57rem;color:var(–txD);margin-bottom:3px}
+.btrack{height:4px;background:var(–bg3);border-radius:2px;overflow:hidden}
+.btrack-fill{height:100%;background:linear-gradient(90deg,var(–cy),var(–gn));border-radius:2px;transition:width .4s}
+.bslog{max-height:110px;overflow-y:auto;margin-top:8px;border-top:1px solid var(–bd);padding-top:6px}
+.bslog-item{display:flex;justify-content:space-between;font-family:var(–mono);font-size:.57rem;padding:3px 0;border-bottom:1px solid var(–bd);color:var(–txD)}
+.bslog-item span:first-child{color:var(–tx)}
+.abform{background:var(–bg2);border:1px solid var(–bdB);border-radius:3px;padding:15px;margin-bottom:14px;display:none}
+.abform.on{display:block}
+
+/* CALENDAR */
+.cal-header{display:flex;align-items:center;gap:10px;margin-bottom:14px;flex-wrap:wrap}
+.cal-title{font-family:var(–mono);font-size:.92rem;color:var(–txB);min-width:130px;text-align:center}
+.cal-vt{display:flex;border:1px solid var(–bdB);border-radius:2px;overflow:hidden;margin-left:auto}
+.cal-vbtn{font-family:var(–mono);font-size:.6rem;padding:5px 12px;cursor:pointer;color:var(–txD);background:transparent;border:none;transition:all .15s}
+.cal-vbtn.on{background:var(–cyD);color:var(–cy)}
+.cal-grid{display:grid;grid-template-columns:repeat(7,1fr);gap:1px;background:var(–bd);border:1px solid var(–bd);border-radius:3px;overflow:hidden}
+.cal-dow{background:var(–bg2);font-family:var(–mono);font-size:.59rem;color:var(–txD);text-align:center;padding:6px 2px}
+.cal-cell{background:var(–bg1);min-height:82px;padding:5px;cursor:pointer;transition:background .15s;vertical-align:top}
+.cal-cell:hover{background:var(–bg2)}
+.cal-cell.other .cal-dn{color:var(–txD);opacity:.35}
+.cal-cell.today{background:var(–cyD)}
+.cal-cell.today .cal-dn{color:var(–cy);font-weight:bold}
+.cal-dn{font-family:var(–mono);font-size:.63rem;color:var(–txD);margin-bottom:3px}
+.cal-ev{font-size:.59rem;padding:2px 4px;border-radius:2px;margin-bottom:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;cursor:pointer}
+.cal-ev:hover{opacity:.82}
+.wk-grid{display:grid;grid-template-columns:42px repeat(7,1fr);gap:1px;background:var(–bd);border:1px solid var(–bd);border-radius:3px;overflow:hidden}
+.wk-head{background:var(–bg2);font-family:var(–mono);font-size:.58rem;color:var(–txD);text-align:center;padding:6px 2px}
+.wk-head.tc{color:var(–cy)}
+.wk-hlbl{background:var(–bg2);font-family:var(–mono);font-size:.53rem;color:var(–txD);text-align:right;padding:3px 5px;border-bottom:1px solid var(–bd)}
+.wk-cell{background:var(–bg1);min-height:34px;border-bottom:1px solid var(–bd);cursor:pointer;position:relative;transition:background .15s}
+.wk-cell:hover{background:var(–bg2)}
+.wk-ev{position:absolute;left:2px;right:2px;top:2px;font-size:.55rem;padding:2px 4px;border-radius:2px;overflow:hidden;white-space:nowrap;text-overflow:ellipsis;z-index:1;cursor:pointer}
+.ec0{background:rgba(0,212,255,.22);color:var(–cy);border-left:2px solid var(–cy)}
+.ec1{background:rgba(0,255,157,.18);color:var(–gn);border-left:2px solid var(–gn)}
+.ec2{background:rgba(255,107,43,.18);color:var(–or);border-left:2px solid var(–or)}
+.ec3{background:rgba(255,209,102,.18);color:var(–yw);border-left:2px solid var(–yw)}
+.ec4{background:rgba(167,139,250,.18);color:var(–pu);border-left:2px solid var(–pu)}
+.ec5{background:rgba(244,114,182,.18);color:var(–pk);border-left:2px solid var(–pk)}
+.cpick{width:20px;height:20px;border-radius:50%;cursor:pointer;border:2px solid transparent;transition:all .15s;flex-shrink:0}
+.cpick.on{border-color:white;transform:scale(1.15)}
+
+/* EXAM */
+.exam-layout{display:grid;grid-template-columns:1fr 320px;gap:14px}
+.exam-list{list-style:none}
+.exam-item{background:var(–bg2);border:1px solid var(–bd);border-radius:3px;margin-bottom:9px;overflow:hidden}
+.exam-item-hd{display:flex;align-items:center;padding:10px 12px;cursor:pointer;gap:8px}
+.exam-item-title{font-size:.79rem;font-weight:500;color:var(–txB);flex:1}
+.exam-detail{display:none;padding:11px 12px;border-top:1px solid var(–bd)}
+.exam-detail.on{display:block}
+.exam-subj-row{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:9px}
+.esub{background:var(–bg3);border-radius:2px;padding:5px 9px;font-family:var(–mono);font-size:.6rem;text-align:center;min-width:70px}
+.esub-n{color:var(–txD);font-size:.56rem;margin-bottom:2px}
+.esub-s{color:var(–cy)}
+.exam-imgs{display:flex;flex-wrap:wrap;gap:7px;margin-top:9px}
+.exam-thumb{width:76px;height:76px;object-fit:cover;border-radius:2px;border:1px solid var(–bdB);cursor:pointer;transition:transform .15s}
+.exam-thumb:hover{transform:scale(1.05)}
+.exam-add-form{background:var(–bg1);border:1px solid var(–bd);border-radius:3px;padding:15px}
+.exam-add-form::before{content:’’;position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(–bdB),transparent)}
+.exsubj-row{display:grid;grid-template-columns:1fr 62px 62px 68px 24px;gap:6px;align-items:end;margin-bottom:7px}
+.chart-tab{font-family:var(–mono);font-size:.6rem;padding:4px 11px;border:1px solid var(–bdB);border-radius:2px;cursor:pointer;color:var(–txD);background:transparent;transition:all .15s;white-space:nowrap}
+.chart-tab:hover{color:var(–cy);border-color:var(–cy)}
+.chart-tab.on{color:var(–cy);border-color:var(–cy);background:var(–cyD)}
+.exam-pdfs{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px}
+.pdf-link{font-family:var(–mono);font-size:.62rem;padding:5px 10px;background:var(–bg3);border:1px solid var(–or);border-radius:2px;color:var(–or);text-decoration:none;transition:all .15s;display:inline-flex;align-items:center;gap:4px}
+.pdf-link:hover{background:var(–orD)}
+.pdf-prev-item{font-family:var(–mono);font-size:.61rem;color:var(–or);padding:4px 8px;background:var(–bg3);border:1px solid var(–bdB);border-radius:2px;display:flex;align-items:center;gap:6px;margin-bottom:4px}
+.pdf-prev-item button{background:none;border:none;cursor:pointer;color:var(–txD);font-size:.9rem;padding:0}
+.pdf-prev-item button:hover{color:var(–or)}
+.upload-zone{border:1px dashed var(–bdB);border-radius:3px;padding:14px;text-align:center;cursor:pointer;font-family:var(–mono);font-size:.61rem;color:var(–txD);transition:all .15s;margin-top:7px}
+.upload-zone:hover{border-color:var(–cy);color:var(–cy);background:var(–cyD)}
+.img-prev-row{display:flex;flex-wrap:wrap;gap:5px;margin-top:7px}
+.img-prev{width:60px;height:60px;object-fit:cover;border-radius:2px;border:1px solid var(–bdB)}
+
+/* STATS */
+.chart-wrap{display:flex;align-items:flex-end;gap:4px;height:96px;margin-bottom:5px}
+.bcol{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:flex-end;gap:3px;height:100%}
+.bfill{width:100%;background:var(–bg3);border-radius:2px 2px 0 0;min-height:2px;border-top:1px solid var(–bdB);transition:height .5s}
+.bfill.today{background:linear-gradient(180deg,var(–cy) 0%,rgba(0,212,255,.18) 100%);border-top-color:var(–cy);box-shadow:0 -2px 7px var(–cyG)}
+.blbl{font-family:var(–mono);font-size:.55rem;color:var(–txD)}
+.rank-list{list-style:none}
+.rank-row{display:flex;align-items:center;gap:7px;margin-bottom:6px}
+.rname{font-family:var(–mono);font-size:.61rem;color:var(–txD);width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;flex-shrink:0}
+.rtrack{flex:1;height:4px;background:var(–bg3);border-radius:2px;overflow:hidden}
+.rfill{height:100%;background:var(–cy);border-radius:2px;transition:width .4s}
+.rtime{font-family:var(–mono);font-size:.59rem;color:var(–cy);width:40px;text-align:right;flex-shrink:0}
+
+/* OVERLAYS */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.77);z-index:500;align-items:center;justify-content:center;padding:12px}
+.overlay.on{display:flex}
+.modal{background:var(–bg1);border:1px solid var(–bdB);border-radius:4px;padding:20px;width:420px;max-width:100%;position:relative;max-height:90vh;overflow-y:auto}
+.modal::before{content:’’;position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,var(–cy),transparent)}
+.modal-title{font-family:var(–mono);font-size:.68rem;color:var(–cy);letter-spacing:.14em;margin-bottom:14px}
+.mrow{margin-bottom:10px}
+.mactions{display:flex;gap:7px;justify-content:flex-end;margin-top:14px}
+.lightbox{display:none;position:fixed;inset:0;background:rgba(0,0,0,.93);z-index:600;align-items:center;justify-content:center;cursor:pointer}
+.lightbox.on{display:flex}
+.lightbox img{max-width:92vw;max-height:88vh;border-radius:3px}
+
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-track{background:var(–bg)}
+::-webkit-scrollbar-thumb{background:var(–bdB);border-radius:2px}
+@media(max-width:700px){
+.timer-layout,.g2,.exam-layout{grid-template-columns:1fr}
+.nav-clock{display:none}
+.page{padding:12px 10px}
+.ntab{padding:0 10px}
+}
+</style>
+
+</head>
+<body>
+
+<nav>
+  <div class="nav-logo" onclick="goPage('home')" style="cursor:pointer">STUDY<span>//</span>OS</div>
+  <div class="nav-tabs">
+    <div class="ntab"     id="tab-home"  onclick="goPage('home')">&#9632;&nbsp;HOME</div>
+    <div class="ntab"     id="tab-timer" onclick="goPage('timer')">&#9654;&nbsp;TIMER</div>
+    <div class="ntab"     id="tab-books" onclick="goPage('books')">&#128218;&nbsp;BOOKS</div>
+    <div class="ntab"     id="tab-cal"   onclick="goPage('cal')">&#128197;&nbsp;CALENDAR</div>
+    <div class="ntab"     id="tab-exam"  onclick="goPage('exam')">&#128200;&nbsp;EXAM</div>
+    <div class="ntab"     id="tab-stats" onclick="goPage('stats')">&#9641;&nbsp;STATS</div>
+    <div class="ntab"     id="tab-other" onclick="goPage('other')">&#9776;&nbsp;OTHER</div>
+  </div>
+  <div class="nav-r">
+    <span class="nav-clock" id="navClock">--</span>
+    <div class="sdot"></div>
+  </div>
+</nav>
+
+<!-- HOME -->
+
+<div class="page on" id="page-home">
+  <div class="home-wrap">
+    <div class="home-hero">
+      <div class="home-logo">STUDY<span>//</span>OS</div>
+      <div class="home-sub">YOUR PERSONAL STUDY DASHBOARD</div>
+      <div class="home-date-disp" id="homeDateDisp">--</div>
+    </div>
+    <div class="home-cards">
+      <div class="hcard hc-timer" onclick="goPage('timer')">
+        <span class="hcard-icon">&#9654;</span>
+        <div class="hcard-name">TIMER</div>
+        <div class="hcard-desc">タイマーで勉強時間を計測。ポモドーロモード対応</div>
+        <div class="hcard-accent" style="border-color:var(--cy);color:var(--cy)" id="hBadgeTimer">0:00</div>
+      </div>
+      <div class="hcard hc-books" onclick="goPage('books')">
+        <span class="hcard-icon">&#128218;</span>
+        <div class="hcard-name">BOOKS</div>
+        <div class="hcard-desc">参考書ごとに学習時間・問題数・ページ数を記録</div>
+        <div class="hcard-accent" style="border-color:var(--gn);color:var(--gn)" id="hBadgeBooks">0冊</div>
+      </div>
+      <div class="hcard hc-cal" onclick="goPage('cal')">
+        <span class="hcard-icon">&#128197;</span>
+        <div class="hcard-name">CALENDAR</div>
+        <div class="hcard-desc">月・週表示で予定を管理。色分けタグ付き</div>
+        <div class="hcard-accent" style="border-color:var(--yw);color:var(--yw)" id="hBadgeCal">0件</div>
+      </div>
+      <div class="hcard hc-exam" onclick="goPage('exam')">
+        <span class="hcard-icon">&#128200;</span>
+        <div class="hcard-name">EXAM</div>
+        <div class="hcard-desc">模試の成績を記録・グラフで推移を可視化。写真添付対応</div>
+        <div class="hcard-accent" style="border-color:var(--pu);color:var(--pu)" id="hBadgeExam">0回</div>
+      </div>
+      <div class="hcard hc-stats" onclick="goPage('stats')">
+        <span class="hcard-icon">&#9641;</span>
+        <div class="hcard-name">STATS</div>
+        <div class="hcard-desc">週間グラフ・累計時間・連続日数・参考書ランキング</div>
+        <div class="hcard-accent" style="border-color:var(--or);color:var(--or)" id="hBadgeStreak">0日</div>
+      </div>
+      <div class="hcard hc-other" onclick="goPage('other')">
+        <span class="hcard-icon">&#9776;</span>
+        <div class="hcard-name">OTHER</div>
+        <div class="hcard-desc">勉強用YouTubeや参考URLを登録。フリーメモ欄</div>
+        <div class="hcard-accent" style="border-color:var(--txD);color:var(--txD)" id="hBadgeLinks">0件</div>
+      </div>
+    </div>
+    <div class="home-stats">
+      <div class="hstat"><span class="hstat-val" id="hToday">0:00</span><div class="hstat-lbl">TODAY</div></div>
+      <div class="hstat"><span class="hstat-val" id="hStreak">0</span><div class="hstat-lbl">STREAK</div></div>
+      <div class="hstat"><span class="hstat-val" id="hAllH">0h</span><div class="hstat-lbl">TOTAL HOURS</div></div>
+      <div class="hstat"><span class="hstat-val" id="hSessions">0</span><div class="hstat-lbl">SESSIONS</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- TIMER -->
+
+<div class="page" id="page-timer">
+  <div class="timer-layout">
+    <div class="card">
+      <div class="stitle">TIMER</div>
+      <div class="flbl">対象の参考書</div>
+      <select class="inp" id="timerBook" style="margin-bottom:11px"></select>
+      <div class="ring-wrap">
+        <svg class="ring-svg" width="150" height="150" viewBox="0 0 150 150">
+          <circle class="ring-bg"   cx="75" cy="75" r="70"/>
+          <circle class="ring-prog" id="ringProg" cx="75" cy="75" r="70"/>
+        </svg>
+        <div class="ring-in">
+          <div class="rdig" id="tDig">25:00</div>
+          <div class="rphase" id="tPhase">FOCUS</div>
+        </div>
+      </div>
+      <div class="pdots" id="pdots"></div>
+      <div class="brow" style="margin-bottom:7px">
+        <button class="btn bc" id="startBtn" onclick="toggleTimer()">&#9654; START</button>
+        <button class="btn bd2" onclick="resetTimer()">RESET</button>
+        <button class="btn bo" id="pomoBtn" onclick="togglePomo()">&#127813; POMO</button>
+      </div>
+      <div class="run-ind" id="runInd"><div class="rdot"></div><span id="runLbl">RECORDING</span></div>
+      <div class="divider"></div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:5px">
+        <span class="flbl" style="margin:0">DAILY GOAL</span>
+        <div style="display:flex;align-items:center;gap:5px">
+          <input type="number" class="inp" id="goalInp" style="width:46px;text-align:center" value="4" min="1" max="24" onchange="saveGoal()">
+          <span class="flbl" style="margin:0">h</span>
+          <span style="font-family:var(--mono);font-size:.58rem;color:var(--cy)" id="goalPct">0%</span>
+        </div>
+      </div>
+      <div class="track"><div class="tfill" id="goalBar" style="width:0%"></div></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:13px">
+      <div class="card">
+        <div class="stitle">TODAY</div>
+        <div class="g3" style="margin-bottom:11px">
+          <div class="sbox"><div class="sval" id="sTotal">0:00</div><div class="slbl">TOTAL</div></div>
+          <div class="sbox"><div class="sval" id="sSess">0</div><div class="slbl">SESSIONS</div></div>
+          <div class="sbox"><div class="sval" id="sStreak">0</div><div class="slbl">STREAK</div></div>
+        </div>
+        <ul class="loglist" id="logList"></ul>
+      </div>
+      <div class="card">
+        <div class="stitle">MANUAL LOG</div>
+        <div style="display:grid;grid-template-columns:1fr 62px 62px 62px auto;gap:6px;align-items:end">
+          <div><div class="flbl">参考書</div><select class="inp" id="manBook"></select></div>
+          <div><div class="flbl">時間(分)</div><input class="inp" type="number" id="manMin" placeholder="30" min="1"></div>
+          <div><div class="flbl">問題数</div><input class="inp" type="number" id="manProb" placeholder="0" min="0"></div>
+          <div><div class="flbl">ページ</div><input class="inp" type="number" id="manPage" placeholder="0" min="0"></div>
+          <button class="btn bc" onclick="manualLog()">+LOG</button>
+        </div>
+        <div style="margin-top:8px"><div class="flbl">メモ</div><input class="inp" id="manNote" placeholder="任意のメモ"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BOOKS -->
+
+<div class="page" id="page-books">
+  <div style="margin-bottom:13px"><button class="btn bc" onclick="toggleAddForm()">&#43; 参考書を追加</button></div>
+  <div class="abform" id="abForm">
+    <div class="stitle">NEW BOOK</div>
+    <div class="g2" style="margin-bottom:8px">
+      <div><div class="flbl">タイトル *</div><input class="inp" id="bTitle" placeholder="例: 鉄壁英単語"></div>
+      <div><div class="flbl">科目</div><input class="inp" id="bSubj" placeholder="例: 英語"></div>
+    </div>
+    <div class="g2" style="margin-bottom:8px">
+      <div><div class="flbl">総ページ数（任意）</div><input class="inp" type="number" id="bTotalP" placeholder="300" min="1"></div>
+      <div><div class="flbl">総問題数（任意）</div><input class="inp" type="number" id="bTotalQ" placeholder="500" min="1"></div>
+    </div>
+    <div style="margin-bottom:10px"><div class="flbl">メモ</div><input class="inp" id="bNote" placeholder="任意のメモ"></div>
+    <div style="display:flex;gap:7px">
+      <button class="btn bg" onclick="addBook()">&#10003; 追加</button>
+      <button class="btn bd2" onclick="toggleAddForm()">CANCEL</button>
+    </div>
+  </div>
+  <div class="books-grid" id="booksGrid"></div>
+</div>
+
+<!-- CALENDAR -->
+
+<div class="page" id="page-cal">
+  <div class="cal-header">
+    <button class="btn bd2" onclick="calMove(-1)">&#9664;</button>
+    <div class="cal-title" id="calTitle"></div>
+    <button class="btn bd2" onclick="calMove(1)">&#9654;</button>
+    <button class="btn bc" onclick="calToday()" style="padding:5px 9px;font-size:.59rem">TODAY</button>
+    <div class="cal-vt" style="margin-left:auto">
+      <div class="cal-vbtn on" id="vbtnM" onclick="setCalView('month',this)">月</div>
+      <div class="cal-vbtn"    id="vbtnW" onclick="setCalView('week',this)">週</div>
+    </div>
+  </div>
+  <div id="calBody"></div>
+</div>
+
+<!-- EXAM -->
+
+<div class="page" id="page-exam">
+  <div class="exam-layout">
+    <div>
+      <div class="card" style="margin-bottom:13px">
+        <div class="stitle">成績推移グラフ</div>
+        <div style="display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:10px">
+          <div style="display:flex;gap:4px;flex-wrap:wrap" id="chartTabs"></div>
+        </div>
+        <div style="display:flex;gap:7px;flex-wrap:wrap;margin-bottom:8px" id="examLegend"></div>
+        <div style="position:relative;height:200px">
+          <canvas id="examCanvas"></canvas>
+          <div id="examEmpty" style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.62rem;color:var(--txD)">// 模試を追加するとグラフが表示されます</div>
+        </div>
+      </div>
+      <div class="card">
+        <div class="stitle">模試一覧</div>
+        <ul class="exam-list" id="examList"></ul>
+      </div>
+    </div>
+    <div style="position:relative">
+      <div class="exam-add-form card">
+        <div class="stitle" id="exFormTitle">模試を追加</div>
+        <div class="mrow"><div class="flbl">模試名 *</div><input class="inp" id="exName" placeholder="例: 全統記述模試"></div>
+        <div class="g2" style="margin-bottom:9px">
+          <div><div class="flbl">受験日</div><input class="inp" type="date" id="exDate"></div>
+          <div><div class="flbl">合計点</div><input class="inp" type="number" id="exTotal" placeholder="450" min="0"></div>
+        </div>
+        <div class="g2" style="margin-bottom:9px">
+          <div><div class="flbl">全体偏差値</div><input class="inp" type="number" id="exHensachi" placeholder="62.5" step="0.1"></div>
+          <div><div class="flbl">全国順位</div><input class="inp" id="exRank" placeholder="1234位"></div>
+        </div>
+        <div class="g2" style="margin-bottom:9px">
+          <div><div class="flbl">校内順位</div><input class="inp" id="exSchoolRank" placeholder="12位"></div>
+          <div></div>
+        </div>
+        <div class="flbl" style="margin-bottom:5px">科目別得点・偏差値</div>
+        <div style="font-family:var(--mono);font-size:.55rem;color:var(--txD);margin-bottom:6px">科目名 / 得点 / 満点 / 偏差値（任意）</div>
+        <div id="exSubjWrap"></div>
+        <button class="btn bd2" onclick="addExSubjRow()" style="font-size:.58rem;padding:4px 9px;margin-bottom:9px">&#43; 科目追加</button>
+        <div class="mrow"><div class="flbl">メモ・コメント</div><textarea class="inp" id="exNote" rows="2" style="resize:none" placeholder="気づいたこと、復習すべきポイントなど"></textarea></div>
+        <div class="flbl" style="margin-bottom:5px">問題・答案の写真</div>
+        <div class="upload-zone" onclick="document.getElementById('exImgInput').click()">
+          &#128247; クリックして写真を追加（複数可）
+          <input type="file" id="exImgInput" accept="image/*" multiple style="display:none" onchange="previewImgs(event)">
+        </div>
+        <div class="img-prev-row" id="exImgPreview"></div>
+        <div class="flbl" style="margin-bottom:5px;margin-top:10px">解答・解説PDF</div>
+        <div class="upload-zone" onclick="document.getElementById('exPdfInput').click()" style="border-color:var(--or);color:var(--or)">
+          &#128196; クリックしてPDFを追加（複数可）
+          <input type="file" id="exPdfInput" accept="application/pdf" multiple style="display:none" onchange="previewPdfs(event)">
+        </div>
+        <div id="exPdfPreview" style="margin-top:6px"></div>
+        <input type="hidden" id="exEditId" value="">
+        <div style="margin-top:13px;display:flex;gap:7px">
+          <button class="btn bc" id="exSubmitBtn" onclick="submitExamForm()">&#10003; 記録する</button>
+          <button class="btn bd2" onclick="clearExamForm()">CLEAR</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- STATS -->
+
+<div class="page" id="page-stats">
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card"><div class="stitle">WEEKLY CHART</div><div class="chart-wrap" id="weekChart"></div></div>
+    <div class="card">
+      <div class="stitle">OVERALL</div>
+      <div class="g2">
+        <div class="sbox"><div class="sval" id="stAllH">0h</div><div class="slbl">TOTAL HOURS</div></div>
+        <div class="sbox"><div class="sval" id="stDays">0</div><div class="slbl">STUDY DAYS</div></div>
+        <div class="sbox"><div class="sval" id="stSess">0</div><div class="slbl">SESSIONS</div></div>
+        <div class="sbox"><div class="sval" id="stStrk">0</div><div class="slbl">STREAK</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="card"><div class="stitle">BOOKS — TIME RANKING</div><ul class="rank-list" id="rankList"></ul></div>
+</div>
+
+<!-- OTHER -->
+
+<div class="page" id="page-other">
+  <div class="g2">
+    <!-- YouTube / URL リスト -->
+    <div class="card">
+      <div class="stitle">STUDY LINKS</div>
+      <div style="display:flex;gap:7px;margin-bottom:10px">
+        <input class="inp" id="linkUrl" placeholder="https://www.youtube.com/..." style="flex:1">
+        <button class="btn bc" onclick="addLink()">+ADD</button>
+      </div>
+      <div style="display:flex;gap:7px;margin-bottom:12px">
+        <input class="inp" id="linkTitle" placeholder="タイトル（任意）" style="flex:1">
+        <select class="inp" id="linkTag" style="width:110px">
+          <option value="youtube">YouTube</option>
+          <option value="web">Web</option>
+          <option value="pdf">PDF</option>
+          <option value="other">その他</option>
+        </select>
+      </div>
+      <ul class="link-list" id="linkList"></ul>
+    </div>
+    <!-- メモ欄 -->
+    <div class="card">
+      <div class="stitle">FREE MEMO</div>
+      <textarea class="memo-ta" id="memoTa" placeholder="// free notes..." oninput="saveMemo()" style="height:420px"></textarea>
+    </div>
+  </div>
+</div>
+
+<!-- CALENDAR MODAL -->
+
+<div class="overlay" id="calOverlay">
+  <div class="modal">
+    <div class="modal-title" id="calModalTitle">予定を追加</div>
+    <div class="mrow"><div class="flbl">タイトル *</div><input class="inp" id="evTitle" placeholder="例: 英語復習"></div>
+    <div class="g2" style="margin-bottom:9px">
+      <div><div class="flbl">開始時刻</div><input class="inp" type="time" id="evStart" value="09:00"></div>
+      <div><div class="flbl">終了時刻</div><input class="inp" type="time" id="evEnd" value="10:00"></div>
+    </div>
+    <div class="mrow"><div class="flbl">参考書・科目（任意）</div><select class="inp" id="evBook"></select></div>
+    <div class="mrow">
+      <div class="flbl" style="margin-bottom:6px">カラー</div>
+      <div style="display:flex;gap:6px" id="colorPicker"></div>
+    </div>
+    <div class="mrow"><div class="flbl">メモ</div><input class="inp" id="evNote" placeholder="任意のメモ"></div>
+    <div class="mactions">
+      <button class="btn bdanger" id="evDelBtn" onclick="deleteEvent()" style="margin-right:auto;display:none">&#215; 削除</button>
+      <button class="btn bd2" onclick="closeCalModal()">CANCEL</button>
+      <button class="btn bc" onclick="saveEvent()">&#10003; 保存</button>
+    </div>
+  </div>
+</div>
+
+<!-- BOOK LOG MODAL -->
+
+<div class="overlay" id="logOverlay">
+  <div class="modal">
+    <div class="modal-title" id="logModalTitle">LOG SESSION</div>
+    <div class="mrow"><div class="flbl">学習時間（分）*</div><input class="inp" type="number" id="mMin" placeholder="30" min="1"></div>
+    <div class="mrow"><div class="flbl">解いた問題数</div><input class="inp" type="number" id="mProb" placeholder="20" min="0"></div>
+    <div class="mrow"><div class="flbl">進んだページ数</div><input class="inp" type="number" id="mPage" placeholder="10" min="0"></div>
+    <div class="mrow"><div class="flbl">メモ・コメント</div><input class="inp" id="mNote" placeholder="例: 第3章完了"></div>
+    <div class="mactions">
+      <button class="btn bd2" onclick="closeLogModal()">CANCEL</button>
+      <button class="btn bc" onclick="submitLog()">&#10003; 記録する</button>
+    </div>
+  </div>
+</div>
+
+<!-- LIGHTBOX -->
+
+<div class="lightbox" id="lightbox" onclick="this.classList.remove('on')">
+  <img id="lbImg" src="" alt="">
+</div>
+
+<!-- PDF VIEWER -->
+
+<div class="overlay" id="pdfOverlay" style="z-index:700;padding:8px">
+  <div style="background:var(--bg1);border:1px solid var(--bdB);border-radius:4px;width:96vw;height:92vh;display:flex;flex-direction:column;position:relative">
+    <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 16px;border-bottom:1px solid var(--bd);flex-shrink:0">
+      <span style="font-family:var(--mono);font-size:.68rem;color:var(--cy)" id="pdfTitle">PDF</span>
+      <button class="btn bd2" onclick="closePdfViewer()" style="padding:4px 12px">&#215; 閉じる</button>
+    </div>
+    <iframe id="pdfFrame" style="flex:1;width:100%;border:none;background:#222"></iframe>
+  </div>
+</div>
+
+<script>
+var S={
+  books:[],logs:{},exams:[],events:[],
+  goalH:4,
+  sec:1500,running:false,sessionStart:null,iv:null,
+  pomo:false,pomoPhase:'work',pomoN:0,WORK:1500,BREAK:300,ringTotal:1500,
+  curBookId:null,logModalBookId:null,
+  calView:'month',calY:0,calM:0,
+  calEditId:null,calEditDate:null,evColor:0,
+  exSubjN:0,exPendingImgs:[],exPendingPdfs:[],
+  links:[],memo:''
+};
+var ECOLS=['#00d4ff','#00ff9d','#ff6b2b','#ffd166','#a78bfa','#f472b6'];
+var ECLBL=['シアン','グリーン','オレンジ','イエロー','パープル','ピンク'];
+
+function p2(n){return String(n).padStart(2,'0')}
+function fs(s){return p2(Math.floor(s/60))+':'+p2(s%60)}
+function fh(m){var h=Math.floor(m/60),mm=m%60;return h?h+'h'+mm+'m':mm+'m'}
+function todayK(){var d=new Date();return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
+function offK(n){var d=new Date();d.setDate(d.getDate()-n);return d.getFullYear()+'-'+p2(d.getMonth()+1)+'-'+p2(d.getDate())}
+function dayN7(n){var d=new Date();d.setDate(d.getDate()-n);return['Su','Mo','Tu','We','Th','Fr','Sa'][d.getDay()]}
+function uid(){return Date.now().toString(36)+Math.random().toString(36).slice(2)}
+function esc(s){return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}
+function getBook(id){return S.books.find(function(b){return b.id===id})}
+function bookName(id){var b=getBook(id);return b?b.title:'(未設定)'}
+
+function save(){
+  var exLite=S.exams.map(function(e){return{id:e.id,name:e.name,date:e.date,total:e.total,hensachi:e.hensachi,rank:e.rank,note:e.note,subjs:e.subjs,imgs:[]}});
+  try{localStorage.setItem('sos5',JSON.stringify({books:S.books,logs:S.logs,events:S.events,goalH:S.goalH,exams:exLite,links:S.links,memo:S.memo}));}catch(e){}
+  S.exams.forEach(function(e){
+    if(e.imgs&&e.imgs.length){try{localStorage.setItem('sos5i_'+e.id,JSON.stringify(e.imgs));}catch(err){}}
+    if(e.pdfs&&e.pdfs.length){try{localStorage.setItem('sos5p_'+e.id,JSON.stringify(e.pdfs));}catch(err){}}
+  });
+}
+function load(){
+  try{
+    var r=localStorage.getItem('sos5');if(!r)return;
+    var d=JSON.parse(r);
+    if(d.books)S.books=d.books;
+    if(d.logs)S.logs=d.logs;
+    if(d.events)S.events=d.events;
+    if(d.goalH)S.goalH=d.goalH;
+    if(d.exams){S.exams=d.exams;S.exams.forEach(function(e){try{var img=localStorage.getItem('sos5i_'+e.id);e.imgs=img?JSON.parse(img):[];}catch(err){e.imgs=[];}try{var pdf=localStorage.getItem('sos5p_'+e.id);e.pdfs=pdf?JSON.parse(pdf):[];}catch(err){e.pdfs=[];}});}    
+    if(d.links)S.links=d.links;
+    if(d.memo)S.memo=d.memo;
+  }catch(err){}
+}
+
+function goPage(id){
+  document.querySelectorAll('.page').forEach(function(p){p.classList.remove('on')});
+  document.querySelectorAll('.ntab').forEach(function(t){t.classList.remove('on')});
+  document.getElementById('page-'+id).classList.add('on');
+  document.getElementById('tab-'+id).classList.add('on');
+  if(id==='home')renderHome();
+  if(id==='timer'){refreshBookSelects();renderTodayLog();renderTimerStats()}
+  if(id==='books')renderBooks();
+  if(id==='cal')renderCal();
+  if(id==='exam'){renderExamList();renderExamChart()}
+  if(id==='stats'){renderStats();renderWeekChart()}
+  if(id==='other'){renderLinks();document.getElementById('memoTa').value=S.memo}
+}
+
+function renderHome(){
+  var d=new Date();
+  var ds=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  document.getElementById('homeDateDisp').textContent=
+    d.getFullYear()+'.'+p2(d.getMonth()+1)+'.'+p2(d.getDate())+' '+ds[d.getDay()];
+  // today total
+  var ls=S.logs[todayK()]||[];
+  var tm=ls.reduce(function(a,l){return a+l.min},0);
+  document.getElementById('hToday').textContent=Math.floor(tm/60)+':'+p2(tm%60);
+  document.getElementById('hBadgeTimer').textContent=Math.floor(tm/60)+':'+p2(tm%60);
+  // streak
+  var st=0;for(var i=0;i<365;i++){var x=S.logs[offK(i)]||[];if(x.length)st++;else if(i>0)break}
+  document.getElementById('hStreak').textContent=st;
+  document.getElementById('hBadgeStreak').textContent=st+'日連続';
+  // all time
+  var allM=0,allS=0;
+  Object.keys(S.logs).forEach(function(k){var ls2=S.logs[k];allS+=ls2.length;allM+=ls2.reduce(function(a,l){return a+l.min},0)});
+  document.getElementById('hAllH').textContent=Math.round(allM/60)+'h';
+  document.getElementById('hSessions').textContent=allS;
+  // badges
+  document.getElementById('hBadgeBooks').textContent=S.books.length+'冊';
+  var todayEvs=S.events.filter(function(e){return e.date===todayK()});
+  document.getElementById('hBadgeCal').textContent=todayEvs.length+'件';
+  document.getElementById('hBadgeExam').textContent=S.exams.length+'回';
+  document.getElementById('hBadgeLinks').textContent=S.links.length+'件';
+}
+
+function tick(){
+  var d=new Date();
+  var ds=['SUN','MON','TUE','WED','THU','FRI','SAT'];
+  document.getElementById('navClock').textContent=d.getFullYear()+'.'+p2(d.getMonth()+1)+'.'+p2(d.getDate())+' '+ds[d.getDay()]+' '+p2(d.getHours())+':'+p2(d.getMinutes());
+}
+
+/* ── TIMER ── */
+var CIRC=2*Math.PI*70;
+function setRing(r){document.getElementById('ringProg').style.strokeDashoffset=CIRC*(1-r)}
+function toggleTimer(){if(S.running)stopTimer();else startTimer()}
+function startTimer(){
+  S.running=true;S.sessionStart=new Date();S.curBookId=document.getElementById('timerBook').value||null;S.ringTotal=S.sec;
+  document.getElementById('startBtn').innerHTML='&#9646;&#9646; PAUSE';document.getElementById('runInd').classList.add('on');
+  document.getElementById('runLbl').textContent='REC: '+(S.curBookId?bookName(S.curBookId):'(未選択)');
+  S.iv=setInterval(function(){S.sec--;document.getElementById('tDig').textContent=fs(S.sec);setRing(S.sec/S.ringTotal);if(S.sec<=0)onTimerEnd();},1000);
+}
+function stopTimer(){
+  S.running=false;clearInterval(S.iv);
+  document.getElementById('startBtn').innerHTML='&#9654; START';document.getElementById('runInd').classList.remove('on');
+  commitSession();
+}
+function resetTimer(){
+  stopTimer();S.sec=S.pomo?S.WORK:1500;
+  if(S.pomo){S.pomoPhase='work';document.getElementById('tPhase').textContent='FOCUS';document.getElementById('ringProg').classList.remove('brk')}
+  document.getElementById('tDig').textContent=fs(S.sec);setRing(1);
+}
+function onTimerEnd(){
+  clearInterval(S.iv);S.running=false;
+  document.getElementById('startBtn').innerHTML='&#9654; START';document.getElementById('runInd').classList.remove('on');
+  commitSession();
+  if(S.pomo){
+    if(S.pomoPhase==='work'){S.pomoN++;S.pomoPhase='break';S.sec=S.BREAK;S.ringTotal=S.BREAK;document.getElementById('tPhase').textContent='BREAK';document.getElementById('ringProg').classList.add('brk');alert('セッション完了！休憩しましょう ☕');}
+    else{S.pomoPhase='work';S.sec=S.WORK;S.ringTotal=S.WORK;document.getElementById('tPhase').textContent='FOCUS';document.getElementById('ringProg').classList.remove('brk');alert('休憩終了！');}
+    renderPomoDots();
+  }else{S.sec=1500;alert('タイマー終了！お疲れ様 ✨')}
+  document.getElementById('tDig').textContent=fs(S.sec);setRing(1);
+}
+function commitSession(){
+  if(!S.sessionStart)return;var el=Math.floor((new Date()-S.sessionStart)/1000);S.sessionStart=null;
+  if(el<30)return;var mins=Math.round(el/60);if(mins<1)return;addSession(S.curBookId,mins,0,0,'');
+}
+function togglePomo(){
+  S.pomo=!S.pomo;document.getElementById('pomoBtn').style.background=S.pomo?'var(--orD)':'transparent';
+  if(S.pomo){S.sec=S.WORK;S.pomoPhase='work';S.pomoN=0;document.getElementById('tPhase').textContent='FOCUS';document.getElementById('ringProg').classList.remove('brk')}else S.sec=1500;
+  if(S.running){clearInterval(S.iv);S.running=false;S.sessionStart=null;document.getElementById('startBtn').innerHTML='&#9654; START';document.getElementById('runInd').classList.remove('on')}
+  document.getElementById('tDig').textContent=fs(S.sec);setRing(1);renderPomoDots();
+}
+function renderPomoDots(){
+  var el=document.getElementById('pdots');if(!S.pomo){el.innerHTML='';return}
+  var h='';for(var i=0;i<8;i++){var c=i<S.pomoN?'done':(i===S.pomoN&&S.running&&S.pomoPhase==='work'?'cur':'');h+='<div class="pdot '+c+'"></div>';}el.innerHTML=h;
+}
+function saveGoal(){S.goalH=parseInt(document.getElementById('goalInp').value)||4;save();renderTimerStats()}
+function renderTimerStats(){
+  var ls=S.logs[todayK()]||[];var tm=ls.reduce(function(a,l){return a+l.min},0);
+  document.getElementById('sTotal').textContent=Math.floor(tm/60)+':'+p2(tm%60);
+  document.getElementById('sSess').textContent=ls.length;
+  var st=0;for(var i=0;i<365;i++){var x=S.logs[offK(i)]||[];if(x.length)st++;else if(i>0)break}
+  document.getElementById('sStreak').textContent=st;
+  var pct=Math.min(100,Math.round(tm/(S.goalH*60)*100));
+  document.getElementById('goalBar').style.width=pct+'%';document.getElementById('goalPct').textContent=pct+'%';
+}
+function renderTodayLog(){
+  var ls=(S.logs[todayK()]||[]).slice().reverse();
+  document.getElementById('logList').innerHTML=ls.map(function(l){return'<li class="logi"><span class="logi-book">'+esc(bookName(l.bookId))+'</span><span class="logi-meta">'+fh(l.min)+(l.prob?' · '+l.prob+'問':'')+' · '+l.time+'</span></li>';}).join('')||'<li style="font-family:var(--mono);font-size:.6rem;color:var(--txD);padding:7px 0">// no sessions yet</li>';
+}
+function manualLog(){
+  var bId=document.getElementById('manBook').value||null;var mins=parseInt(document.getElementById('manMin').value)||0;
+  if(mins<1){alert('時間を入力してください');return}
+  addSession(bId,mins,parseInt(document.getElementById('manProb').value)||0,parseInt(document.getElementById('manPage').value)||0,document.getElementById('manNote').value.trim());
+  ['manMin','manProb','manPage','manNote'].forEach(function(i){document.getElementById(i).value=''});
+}
+function addSession(bookId,mins,prob,page,note){
+  var now=new Date();var dk=todayK();var ts=p2(now.getHours())+':'+p2(now.getMinutes());
+  if(bookId){var b=getBook(bookId);if(b)b.sessions.push({date:dk,min:mins,prob:prob,page:page,note:note,time:ts});}
+  if(!S.logs[dk])S.logs[dk]=[];S.logs[dk].push({bookId:bookId,min:mins,prob:prob,time:ts});
+  save();renderTodayLog();renderTimerStats();
+  if(document.getElementById('page-books').classList.contains('on'))renderBooks();
+}
+function refreshBookSelects(){
+  var opts=S.books.map(function(b){return'<option value="'+b.id+'">'+esc(b.title)+'</option>'}).join('');
+  var none='<option value="">-- 参考書を選択 --</option>';
+  ['timerBook','manBook'].forEach(function(id){var el=document.getElementById(id);if(el)el.innerHTML=none+opts});
+}
+
+/* ── BOOKS ── */
+function toggleAddForm(){document.getElementById('abForm').classList.toggle('on')}
+function addBook(){
+  var t=document.getElementById('bTitle').value.trim();if(!t){alert('タイトルを入力してください');return}
+  S.books.push({id:uid(),title:t,subj:document.getElementById('bSubj').value.trim(),
+    totalP:parseInt(document.getElementById('bTotalP').value)||0,totalQ:parseInt(document.getElementById('bTotalQ').value)||0,
+    note:document.getElementById('bNote').value.trim(),sessions:[]});
+  ['bTitle','bSubj','bTotalP','bTotalQ','bNote'].forEach(function(i){document.getElementById(i).value=''});
+  document.getElementById('abForm').classList.remove('on');
+  save();renderBooks();refreshBookSelects();refreshEvBookSelect();
+}
+function deleteBook(id){
+  if(!confirm('この参考書を削除しますか？'))return;
+  S.books=S.books.filter(function(b){return b.id!==id});
+  Object.keys(S.logs).forEach(function(k){S.logs[k]=S.logs[k].filter(function(l){return l.bookId!==id})});
+  save();renderBooks();refreshBookSelects();refreshEvBookSelect();
+}
+function openLogModal(id){
+  S.logModalBookId=id;document.getElementById('logModalTitle').textContent='LOG: '+getBook(id).title;
+  ['mMin','mProb','mPage','mNote'].forEach(function(i){document.getElementById(i).value=''});
+  document.getElementById('logOverlay').classList.add('on');
+}
+function closeLogModal(){document.getElementById('logOverlay').classList.remove('on')}
+function submitLog(){
+  var mins=parseInt(document.getElementById('mMin').value)||0;if(mins<1){alert('時間を入力してください');return}
+  addSession(S.logModalBookId,mins,parseInt(document.getElementById('mProb').value)||0,parseInt(document.getElementById('mPage').value)||0,document.getElementById('mNote').value.trim());
+  closeLogModal();renderBooks();
+}
+function renderBooks(){
+  var grid=document.getElementById('booksGrid');
+  if(!S.books.length){grid.innerHTML='<div style="font-family:var(--mono);font-size:.65rem;color:var(--txD);grid-column:1/-1;padding:16px 0">// まだ参考書が登録されていません。</div>';return}
+  grid.innerHTML=S.books.map(function(b){
+    var tm=b.sessions.reduce(function(a,s){return a+s.min},0);
+    var tp=b.sessions.reduce(function(a,s){return a+s.prob},0);
+    var tpg=b.sessions.reduce(function(a,s){return a+s.page},0);
+    var ppct=0,plbl='';
+    if(b.totalQ>0){ppct=Math.min(100,Math.round(tp/b.totalQ*100));plbl='問題 '+tp+'/'+b.totalQ}
+    else if(b.totalP>0){ppct=Math.min(100,Math.round(tpg/b.totalP*100));plbl='ページ '+tpg+'/'+b.totalP}
+    var prog=ppct>0?'<div class="bprog-wrap"><div class="bprog-lbl"><span>PROGRESS</span><span>'+esc(plbl)+'</span></div><div class="btrack"><div class="btrack-fill" style="width:'+ppct+'%"></div></div></div>':'';
+    var rhtml=b.sessions.slice(-5).reverse().map(function(s){
+      var pts=[];if(s.prob>0)pts.push(s.prob+'問');if(s.page>0)pts.push(s.page+'p');if(s.note)pts.push(s.note);
+      return'<div class="bslog-item"><span>'+s.date+' '+s.time+'</span><span>'+fh(s.min)+(pts.length?' · '+pts.join(' · '):'')+'</span></div>';
+    }).join('');
+    return'<div class="bcard"><div class="bcard-hd"><div class="bcard-title">'+esc(b.title)+'</div>'+(b.subj?'<div class="bcard-tag">'+esc(b.subj)+'</div>':'')+'</div>'
+      +'<div class="bcard-body"><div class="bstats"><div class="bstat"><div class="bstat-v">'+fh(tm)+'</div><div class="bstat-l">TIME</div></div>'
+      +'<div class="bstat"><div class="bstat-v">'+tp+'</div><div class="bstat-l">PROBLEMS</div></div>'
+      +'<div class="bstat"><div class="bstat-v">'+tpg+'</div><div class="bstat-l">PAGES</div></div></div>'
+      +prog+'<div style="display:flex;gap:6px"><button class="btn bc" onclick="openLogModal(\''+b.id+'\')">&#43; 記録</button>'
+      +'<button class="btn bdanger" onclick="deleteBook(\''+b.id+'\')" style="margin-left:auto">&#215; 削除</button></div>'
+      +(rhtml?'<div class="bslog">'+rhtml+'</div>':'')+'</div></div>';
+  }).join('');
+}
+
+/* ── CALENDAR ── */
+function initCal(){var d=new Date();S.calY=d.getFullYear();S.calM=d.getMonth();buildCPicker();renderCal()}
+function buildCPicker(){
+  document.getElementById('colorPicker').innerHTML=ECOLS.map(function(c,i){
+    return'<div class="cpick'+(i===S.evColor?' on':'')+'" style="background:'+c+'" onclick="pickColor('+i+')" title="'+ECLBL[i]+'"></div>';
+  }).join('');
+}
+function pickColor(i){S.evColor=i;document.querySelectorAll('.cpick').forEach(function(c,ci){c.classList.toggle('on',ci===i)})}
+function calMove(d){S.calM+=d;if(S.calM>11){S.calM=0;S.calY++}if(S.calM<0){S.calM=11;S.calY--}renderCal()}
+function calToday(){var d=new Date();S.calY=d.getFullYear();S.calM=d.getMonth();renderCal()}
+function setCalView(v,el){S.calView=v;document.querySelectorAll('.cal-vbtn').forEach(function(b){b.classList.remove('on')});el.classList.add('on');renderCal()}
+function dStr(y,m,d){return y+'-'+p2(m+1)+'-'+p2(d)}
+function evsOn(ds){return S.events.filter(function(e){return e.date===ds})}
+function renderCal(){
+  var now=new Date();var todStr=dStr(now.getFullYear(),now.getMonth(),now.getDate());
+  document.getElementById('calTitle').textContent=S.calY+'年'+(S.calM+1)+'月';
+  document.getElementById('calBody').innerHTML=S.calView==='month'?buildMonthCal(todStr):buildWeekCal(todStr);
+}
+function buildMonthCal(todStr){
+  var DOW=['日','月','火','水','木','金','土'];
+  var first=new Date(S.calY,S.calM,1);var dow=first.getDay();
+  var dim=new Date(S.calY,S.calM+1,0).getDate();var dip=new Date(S.calY,S.calM,0).getDate();
+  var h='<div class="cal-grid">';
+  DOW.forEach(function(d){h+='<div class="cal-dow">'+d+'</div>'});
+  for(var i=dow-1;i>=0;i--)h+='<div class="cal-cell other"><div class="cal-dn">'+(dip-i)+'</div></div>';
+  for(var d=1;d<=dim;d++){
+    var ds=dStr(S.calY,S.calM,d);var isT=ds===todStr;
+    var evs=evsOn(ds);
+    var eh=evs.slice(0,3).map(function(e){return'<div class="cal-ev ec'+e.color+'" onclick="openCalEv(\''+e.id+'\',event)">'+esc(e.start?e.start+' ':'')+esc(e.title)+'</div>';}).join('');
+    if(evs.length>3)eh+='<div style="font-family:var(--mono);font-size:.52rem;color:var(--txD)">+'+(evs.length-3)+' more</div>';
+    h+='<div class="cal-cell'+(isT?' today':'')+(ds<todStr&&!isT?' other':'')+'" onclick="openNewEv(\''+ds+'\',event)"><div class="cal-dn">'+d+'</div>'+eh+'</div>';
+  }
+  var tot=dow+dim;var rem=(7-tot%7)%7;
+  for(var n=1;n<=rem;n++)h+='<div class="cal-cell other"><div class="cal-dn">'+n+'</div></div>';
+  return h+'</div>';
+}
+function buildWeekCal(todStr){
+  var now=new Date();var ws=new Date(now);ws.setDate(now.getDate()-now.getDay());
+  var cols=[];
+  for(var i=0;i<7;i++){var dd=new Date(ws);dd.setDate(ws.getDate()+i);cols.push({ds:dStr(dd.getFullYear(),dd.getMonth(),dd.getDate()),d:dd.getDate(),dow:['日','月','火','水','木','金','土'][i]});}
+  var HOURS=[];for(var h=6;h<=22;h++)HOURS.push(h);
+  var html='<div class="wk-grid"><div class="wk-head"></div>';
+  cols.forEach(function(c){html+='<div class="wk-head'+(c.ds===todStr?' tc':'')+'">'+(c.ds===todStr?'<b>':'')+c.dow+' '+c.d+(c.ds===todStr?'</b>':'')+'</div>';});
+  HOURS.forEach(function(h){
+    html+='<div class="wk-hlbl">'+p2(h)+'</div>';
+    cols.forEach(function(c){
+      var evs=evsOn(c.ds).filter(function(e){return e.start&&parseInt(e.start.split(':')[0])===h});
+      var eh=evs.map(function(e){return'<div class="wk-ev ec'+e.color+'" onclick="openCalEv(\''+e.id+'\',event)">'+esc(e.start)+' '+esc(e.title)+'</div>';}).join('');
+      html+='<div class="wk-cell" onclick="openNewEv(\''+c.ds+'\',event)">'+eh+'</div>';
+    });
+  });
+  return html+'</div>';
+}
+function openNewEv(ds,ev){if(ev)ev.stopPropagation();S.calEditId=null;S.calEditDate=ds;
+  document.getElementById('calModalTitle').textContent=ds+' に予定を追加';
+  document.getElementById('evTitle').value='';document.getElementById('evStart').value='09:00';document.getElementById('evEnd').value='10:00';document.getElementById('evNote').value='';
+  document.getElementById('evDelBtn').style.display='none';S.evColor=0;buildCPicker();refreshEvBookSelect();
+  document.getElementById('calOverlay').classList.add('on');
+}
+function openCalEv(id,ev){if(ev)ev.stopPropagation();var e=S.events.find(function(x){return x.id===id});if(!e)return;
+  S.calEditId=id;S.calEditDate=e.date;
+  document.getElementById('calModalTitle').textContent=e.date+' の予定を編集';
+  document.getElementById('evTitle').value=e.title;document.getElementById('evStart').value=e.start||'09:00';document.getElementById('evEnd').value=e.end||'10:00';document.getElementById('evNote').value=e.note||'';
+  document.getElementById('evDelBtn').style.display='';S.evColor=e.color||0;buildCPicker();refreshEvBookSelect(e.bookId);
+  document.getElementById('calOverlay').classList.add('on');
+}
+function refreshEvBookSelect(sel){
+  document.getElementById('evBook').innerHTML='<option value="">タグなし</option>'+S.books.map(function(b){return'<option value="'+b.id+'"'+(sel===b.id?' selected':'')+'>'+esc(b.title)+'</option>'}).join('');
+}
+function saveEvent(){
+  var title=document.getElementById('evTitle').value.trim();if(!title){alert('タイトルを入力してください');return}
+  var ev={id:S.calEditId||uid(),date:S.calEditDate,title:title,start:document.getElementById('evStart').value,end:document.getElementById('evEnd').value,bookId:document.getElementById('evBook').value||null,note:document.getElementById('evNote').value.trim(),color:S.evColor};
+  if(S.calEditId)S.events=S.events.map(function(e){return e.id===S.calEditId?ev:e});else S.events.push(ev);
+  save();closeCalModal();renderCal();
+}
+function deleteEvent(){if(!S.calEditId)return;if(!confirm('削除しますか？'))return;S.events=S.events.filter(function(e){return e.id!==S.calEditId});save();closeCalModal();renderCal()}
+function closeCalModal(){document.getElementById('calOverlay').classList.remove('on')}
+
+/* ── EXAM ── */
+function addExSubjRow(initData){
+  S.exSubjN++;
+  var w=document.getElementById('exSubjWrap');
+  var n=S.exSubjN;
+  var row=document.createElement('div');
+  row.className='exsubj-row';row.id='esr_'+n;
+  row.innerHTML=''
+    +'<div><div class="flbl">科目名</div><input class="inp" placeholder="英語" id="esn_'+n+'"></div>'
+    +'<div><div class="flbl">得点</div><input class="inp" type="number" placeholder="0" min="0" id="ess_'+n+'"></div>'
+    +'<div><div class="flbl">満点</div><input class="inp" type="number" placeholder="100" min="1" id="esm_'+n+'"></div>'
+    +'<div><div class="flbl">偏差値</div><input class="inp" type="number" placeholder="-" step="0.1" id="esh_'+n+'"></div>'
+    +'<div style="padding-bottom:6px"><button class="btn bdanger" style="padding:4px 6px" data-rn="'+n+'" onclick="rmExSubj(this.dataset.rn)">&#215;</button></div>';
+  w.appendChild(row);
+  if(initData){
+    document.getElementById('esn_'+n).value=initData.name||'';
+    document.getElementById('ess_'+n).value=initData.score!=null?initData.score:'';
+    document.getElementById('esm_'+n).value=initData.max!=null?initData.max:'';
+    document.getElementById('esh_'+n).value=initData.hensachi!=null?initData.hensachi:'';
+  }
+}
+function rmExSubj(n){var el=document.getElementById('esr_'+n);if(el)el.remove()}
+function getExSubjs(){
+  var rows=[];
+  for(var i=1;i<=S.exSubjN;i++){
+    var n=document.getElementById('esn_'+i);if(!n||!n.parentElement)continue;
+    var name=n.value.trim();if(!name)continue;
+    var hEl=document.getElementById('esh_'+i);
+    rows.push({
+      name:name,
+      score:parseFloat(document.getElementById('ess_'+i).value)||0,
+      max:parseFloat(document.getElementById('esm_'+i).value)||100,
+      hensachi:hEl&&hEl.value!==''?parseFloat(hEl.value):null
+    });
+  }
+  return rows;
+}
+function previewPdfs(ev){
+  var files=Array.from(ev.target.files);
+  var prev=document.getElementById('exPdfPreview');
+  files.forEach(function(f){
+    var r=new FileReader();
+    r.onload=function(e){
+      var idx=S.exPendingPdfs.length;
+      S.exPendingPdfs.push({name:f.name,data:e.target.result});
+      var div=document.createElement('div');div.className='pdf-prev-item';div.id='pdfprev_'+idx;
+      div.innerHTML='&#128196; '+f.name+'<button onclick="rmPendingPdf('+idx+')">&#215;</button>';
+      prev.appendChild(div);
+    };
+    r.readAsDataURL(f);
+  });
+}
+function rmPendingPdf(idx){
+  S.exPendingPdfs[idx]=null;
+  var el=document.getElementById('pdfprev_'+idx);if(el)el.remove();
+}
+function previewImgs(ev){
+  var files=Array.from(ev.target.files);var prev=document.getElementById('exImgPreview');
+  files.forEach(function(f){
+    var r=new FileReader();r.onload=function(e){S.exPendingImgs.push(e.target.result);var img=document.createElement('img');img.src=e.target.result;img.className='img-prev';prev.appendChild(img);};r.readAsDataURL(f);
+  });
+}
+function submitExamForm(){
+  var name=document.getElementById('exName').value.trim();
+  if(!name){alert('模試名を入力してください');return;}
+  var editId=document.getElementById('exEditId').value;
+  var ex={
+    id:editId||uid(),
+    name:name,
+    date:document.getElementById('exDate').value,
+    total:document.getElementById('exTotal').value!==''?parseFloat(document.getElementById('exTotal').value):null,
+    hensachi:document.getElementById('exHensachi').value!==''?parseFloat(document.getElementById('exHensachi').value):null,
+    rank:document.getElementById('exRank').value.trim(),
+    schoolRank:document.getElementById('exSchoolRank').value.trim(),
+    note:document.getElementById('exNote').value.trim(),
+    subjs:getExSubjs()
+  };
+  if(editId){
+    /* 編集: 既存の画像/PDFを引き継ぎ、新規追加分をマージ */
+    var existing=S.exams.find(function(e){return e.id===editId});
+    ex.imgs=(existing?existing.imgs||[]:[]).concat(S.exPendingImgs);
+    ex.pdfs=(existing?existing.pdfs||[]:[]).concat(S.exPendingPdfs.filter(Boolean));
+    S.exams=S.exams.map(function(e){return e.id===editId?ex:e;});
+  } else {
+    ex.imgs=S.exPendingImgs.slice();
+    ex.pdfs=S.exPendingPdfs.filter(Boolean).slice();
+    S.exams.push(ex);
+  }
+  save();clearExamForm();renderExamList();renderExamChart();
+}
+/* 後方互換 */
+function addExam(){submitExamForm();}
+function clearExamForm(){
+  ['exName','exDate','exTotal','exHensachi','exRank','exSchoolRank','exNote'].forEach(function(i){
+    var el=document.getElementById(i);if(el)el.value='';
+  });
+  document.getElementById('exEditId').value='';
+  document.getElementById('exFormTitle').textContent='模試を追加';
+  document.getElementById('exSubmitBtn').textContent='✓ 記録する';
+  document.getElementById('exSubjWrap').innerHTML='';S.exSubjN=0;S.exPendingImgs=[];
+  document.getElementById('exImgPreview').innerHTML='';document.getElementById('exImgInput').value='';
+  S.exPendingPdfs=[];document.getElementById('exPdfPreview').innerHTML='';document.getElementById('exPdfInput').value='';
+}
+function deleteExam(id){
+  if(!confirm('この模試記録を削除しますか？'))return;
+  S.exams=S.exams.filter(function(e){return e.id!==id});
+  try{localStorage.removeItem('sos5i_'+id)}catch(e){}
+  try{localStorage.removeItem('sos5p_'+id)}catch(e){}
+  save();renderExamList();renderExamChart();
+}
+function openEditExam(id){
+  var e=S.exams.find(function(x){return x.id===id});
+  if(!e) return;
+  /* フォームにデータを展開 */
+  document.getElementById('exEditId').value=id;
+  document.getElementById('exFormTitle').textContent='模試を編集';
+  document.getElementById('exSubmitBtn').textContent='✓ 更新する';
+  document.getElementById('exName').value=e.name||'';
+  document.getElementById('exDate').value=e.date||'';
+  document.getElementById('exTotal').value=e.total!=null?e.total:'';
+  document.getElementById('exHensachi').value=e.hensachi!=null?e.hensachi:'';
+  document.getElementById('exRank').value=e.rank||'';
+  document.getElementById('exSchoolRank').value=e.schoolRank||'';
+  document.getElementById('exNote').value=e.note||'';
+  /* 科目行を再構築 */
+  document.getElementById('exSubjWrap').innerHTML='';S.exSubjN=0;S.exPendingImgs=[];S.exPendingPdfs=[];
+  document.getElementById('exImgPreview').innerHTML='';document.getElementById('exPdfPreview').innerHTML='';
+  (e.subjs||[]).forEach(function(s){addExSubjRow(s);});
+  /* フォームにスクロール */
+  document.querySelector('.exam-add-form').scrollIntoView({behavior:'smooth',block:'start'});
+}
+function toggleExDet(id){document.getElementById('exd_'+id).classList.toggle('on')}
+function openLB(src){document.getElementById('lbImg').src=src;document.getElementById('lightbox').classList.add('on')}
+function renderExamList(){
+  var list=document.getElementById('examList');
+  if(!S.exams.length){
+    list.innerHTML='<li style="font-family:var(--mono);font-size:.61rem;color:var(--txD);padding:9px 0">// まだ模試の記録がありません</li>';
+    return;
+  }
+  var sorted=S.exams.slice().sort(function(a,b){return(b.date||'').localeCompare(a.date||'')});
+  var html='';
+  sorted.forEach(function(e){
+    var sh='';
+    (e.subjs||[]).forEach(function(s){
+      sh+='<div class="esub">';
+      sh+='<div class="esub-n">'+esc(s.name)+'</div>';
+      sh+='<div class="esub-s">'+s.score+'/'+s.max+'</div>';
+      if(s.hensachi!=null) sh+='<div style="font-size:.54rem;color:var(--gn);margin-top:2px">偏差値 '+s.hensachi+'</div>';
+      sh+='</div>';
+    });
+    var ih='';
+    (e.imgs||[]).forEach(function(src){ih+='<img class="exam-thumb" src="'+src+'" onclick="openLB(this.src)">';});
+    var ph='';
+    (e.pdfs||[]).forEach(function(p,pi){
+      ph+='<button class="pdf-link" data-eid="'+e.id+'" data-pi="'+pi+'" onclick="openPdfViewer(this.dataset.eid,this.dataset.pi)">&#128196; '+esc(p.name)+'</button>';
+    });
+    var rankBadge='';
+    if(e.rank) rankBadge+='<span style="font-family:var(--mono);font-size:.58rem;color:var(--txD)">全国 '+esc(e.rank)+'</span> ';
+    if(e.schoolRank) rankBadge+='<span style="font-family:var(--mono);font-size:.58rem;color:var(--yw)">校内 '+esc(e.schoolRank)+'</span>';
+    html+='<li class="exam-item">';
+    html+='<div class="exam-item-hd" data-eid="'+e.id+'" onclick="toggleExDet(this.dataset.eid)">';
+    html+='<div style="flex:1"><div class="exam-item-title">'+esc(e.name)+'</div>';
+    if(e.date) html+='<div style="font-family:var(--mono);font-size:.58rem;color:var(--txD)">'+e.date+'</div>';
+    html+='</div>';
+    if(e.hensachi!=null) html+='<div style="font-family:var(--mono);font-size:.7rem;color:var(--gn);margin-right:8px">偏差値 '+e.hensachi+'</div>';
+    if(e.total!=null) html+='<div style="font-family:var(--mono);font-size:.88rem;color:var(--cy)">'+e.total+'点</div>';
+    html+='<div style="font-family:var(--mono);font-size:.62rem;color:var(--txD);margin-left:6px">&#9660;</div>';
+    html+='</div>';
+    html+='<div class="exam-detail" id="exd_'+e.id+'">';
+    if(sh) html+='<div class="exam-subj-row">'+sh+'</div>';
+    if(rankBadge) html+='<div style="display:flex;gap:10px;flex-wrap:wrap;margin-bottom:8px">'+rankBadge+'</div>';
+    if(e.note) html+='<div style="font-size:.72rem;color:var(--txD);margin-bottom:8px;line-height:1.55">'+esc(e.note)+'</div>';
+    if(ih) html+='<div class="exam-imgs">'+ih+'</div>';
+    if(ph) html+='<div class="exam-pdfs">'+ph+'</div>';
+    html+='<div style="margin-top:10px;display:flex;gap:7px">';
+    html+='<button class="btn bc" data-eid="'+e.id+'" onclick="openEditExam(this.dataset.eid)">&#9998; 編集</button>';
+    html+='<button class="btn bdanger" data-eid="'+e.id+'" onclick="deleteExam(this.dataset.eid)">&#215; 削除</button>';
+    html+='</div>';
+    html+='</div></li>';
+  });
+  list.innerHTML=html;
+}
+/* グラフの現在表示タブ: "all" | 科目名 */
+var chartTab = 'all';
+
+function buildChartTabs(){
+  var sorted=S.exams.filter(function(e){return e.date});
+  var sNames={};
+  sorted.forEach(function(e){e.subjs.forEach(function(s){sNames[s.name]=1})});
+  var tabs=[{key:'all',label:'全体'}];
+  Object.keys(sNames).forEach(function(n){tabs.push({key:n,label:n})});
+  var el=document.getElementById('chartTabs');
+  var html='';
+  tabs.forEach(function(t){
+    var cls='chart-tab'+(chartTab===t.key?' on':'');
+    html+='<div class="'+cls+'" data-tabkey="'+esc(t.key)+'">'+esc(t.label)+'</div>';
+  });
+  el.innerHTML=html;
+  el.querySelectorAll('.chart-tab').forEach(function(btn){
+    btn.addEventListener('click',function(){setChartTab(this.dataset.tabkey);});
+  });
+}
+
+function setChartTab(key){
+  chartTab=key;
+  buildChartTabs();
+  drawExamChart();
+}
+
+function renderExamChart(){
+  buildChartTabs();
+  drawExamChart();
+}
+
+function drawExamChart(){
+  var canvas=document.getElementById('examCanvas');
+  var empty=document.getElementById('examEmpty');
+  var legend=document.getElementById('examLegend');
+  var sorted=S.exams.filter(function(e){return e.date}).sort(function(a,b){return a.date.localeCompare(b.date)});
+
+  if(!sorted.length){
+    canvas.style.display='none';empty.style.display='flex';legend.innerHTML='';return;
+  }
+  canvas.style.display='block';empty.style.display='none';
+
+  var W=canvas.parentElement.offsetWidth||600, H=200;
+  canvas.width=W;canvas.height=H;
+  var ctx=canvas.getContext('2d');
+  ctx.clearRect(0,0,W,H);
+
+  var PAD={l:46,r:14,t:14,b:28};
+  var cw=W-PAD.l-PAD.r, ch=H-PAD.t-PAD.b;
+
+  /* 表示するシリーズを決定 */
+  var SCOLS=['#ff6b2b','#ffd166','#a78bfa','#f472b6','#fb923c','#34d399'];
+  var allSubjNames={};
+  sorted.forEach(function(e){e.subjs.forEach(function(s){allSubjNames[s.name]=1})});
+  allSubjNames=Object.keys(allSubjNames);
+
+  var series=[];
+  if(chartTab==='all'){
+    /* 全体タブ: 合計点・偏差値・全科目 */
+    series.push({key:'total',   label:'合計点', color:'#00d4ff'});
+    series.push({key:'hensachi',label:'偏差値',  color:'#00ff9d'});
+    allSubjNames.forEach(function(n,i){
+      series.push({key:'s:'+n, label:n, color:SCOLS[i%SCOLS.length]});
+    });
+  } else {
+    /* 科目タブ: 得点 + 偏差値(あれば) + 満点ライン */
+    var sidx=allSubjNames.indexOf(chartTab);
+    var scol=SCOLS[sidx>=0?sidx%SCOLS.length:0];
+    series.push({key:'s:'+chartTab,  label:chartTab+'（得点）', color:scol});
+    series.push({key:'sh:'+chartTab, label:chartTab+'（偏差値）', color:'#00ff9d'});
+    series.push({key:'sm:'+chartTab, label:chartTab+'（満点）',  color:'rgba(200,216,232,.25)', dashed:true});
+  }
+
+  /* y軸最大値 */
+  var maxV=1;
+  sorted.forEach(function(e){
+    series.forEach(function(ser){
+      var v=getSeriesVal(e,ser.key);
+      if(v!=null) maxV=Math.max(maxV,v);
+    });
+  });
+
+  /* グリッド */
+  ctx.strokeStyle='rgba(42,61,86,.5)';ctx.lineWidth=1;
+  for(var gi=0;gi<=4;gi++){
+    var gy=PAD.t+ch*gi/4;
+    ctx.beginPath();ctx.moveTo(PAD.l,gy);ctx.lineTo(PAD.l+cw,gy);ctx.stroke();
+  }
+  ctx.font='9px Share Tech Mono,monospace';ctx.fillStyle='#4a6070';ctx.textAlign='right';
+  for(var yi=0;yi<=4;yi++){
+    ctx.fillText(Math.round(maxV*(4-yi)/4), PAD.l-5, PAD.t+ch*yi/4+4);
+  }
+
+  /* x軸ラベル */
+  ctx.textAlign='center';ctx.fillStyle='#4a6070';
+  sorted.forEach(function(e,i){
+    var x=sorted.length===1 ? PAD.l+cw/2 : PAD.l+cw*i/(sorted.length-1);
+    ctx.fillText(e.date.slice(5), x, H-6);
+  });
+
+  /* 折れ線 */
+  series.forEach(function(ser){
+    var pts=sorted.map(function(e,i){
+      var x=sorted.length===1 ? PAD.l+cw/2 : PAD.l+cw*i/(sorted.length-1);
+      var v=getSeriesVal(e,ser.key);
+      if(v==null) return null;
+      return {x:x, y:PAD.t+ch*(1-v/maxV)};
+    });
+    var valid=pts.filter(Boolean);
+    if(!valid.length) return;
+
+    ctx.strokeStyle=ser.color;
+    ctx.lineWidth=ser.dashed?1.5:2.5;
+    if(ser.dashed){ctx.setLineDash([5,4]);}else{ctx.setLineDash([]);}
+    ctx.beginPath();
+    var first=true;
+    pts.forEach(function(p){
+      if(!p) return;
+      if(first){ctx.moveTo(p.x,p.y);first=false;}
+      else ctx.lineTo(p.x,p.y);
+    });
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    if(!ser.dashed){
+      valid.forEach(function(p){
+        ctx.fillStyle=ser.color;
+        ctx.beginPath();ctx.arc(p.x,p.y,4,0,Math.PI*2);ctx.fill();
+        ctx.strokeStyle='#0a0c10';ctx.lineWidth=1.5;ctx.stroke();
+        /* 値ラベル */
+        ctx.fillStyle=ser.color;
+        ctx.font='9px Share Tech Mono,monospace';
+        ctx.textAlign='center';
+        var txt=String(Math.round(getSeriesValAtIndex(sorted,pts.indexOf(p),ser.key)));
+        ctx.fillText(txt, p.x, p.y-8);
+      });
+    }
+  });
+
+  /* 凡例 */
+  var visibleSeries=series.filter(function(s){
+    return sorted.some(function(e){return getSeriesVal(e,s.key)!=null;});
+  });
+  legend.innerHTML=visibleSeries.map(function(s){
+    var lineStyle=s.dashed
+      ?'border-top:2px dashed '+s.color+';width:16px;height:0'
+      :'width:16px;height:2px;background:'+s.color+';box-shadow:0 0 4px '+s.color;
+    return '<div style="display:flex;align-items:center;gap:4px;font-family:var(--mono);font-size:.57rem;color:'+s.color+'">'
+      +'<div style="'+lineStyle+'"></div>'+esc(s.label)+'</div>';
+  }).join('');
+}
+
+function getSeriesVal(e, key){
+  if(key==='total') return e.total!=null ? e.total : null;
+  if(key==='hensachi') return e.hensachi!=null ? e.hensachi : null;
+  if(key.slice(0,2)==='s:'){
+    var n=key.slice(2);
+    var sub=e.subjs.find(function(s){return s.name===n});
+    return sub ? sub.score : null;
+  }
+  if(key.slice(0,3)==='sm:'){
+    var n2=key.slice(3);
+    var sub2=e.subjs.find(function(s){return s.name===n2});
+    return sub2 ? sub2.max : null;
+  }
+  if(key.slice(0,3)==='sh:'){
+    var n3=key.slice(3);
+    var sub3=e.subjs.find(function(s){return s.name===n3});
+    return (sub3&&sub3.hensachi!=null) ? sub3.hensachi : null;
+  }
+  return null;
+}
+
+function getSeriesValAtIndex(sorted, idx, key){
+  if(idx<0||idx>=sorted.length) return '';
+  var v=getSeriesVal(sorted[idx],key);
+  return v!=null ? v : '';
+}
+
+
+/* ── LINKS ── */
+var LINK_ICONS={youtube:'&#128250;',web:'&#127760;',pdf:'&#128196;',other:'&#9776;'};
+function addLink(){
+  var url=document.getElementById('linkUrl').value.trim();
+  if(!url){alert('URLを入力してください');return}
+  var title=document.getElementById('linkTitle').value.trim()||url;
+  var tag=document.getElementById('linkTag').value;
+  S.links.push({id:uid(),url:url,title:title,tag:tag});
+  document.getElementById('linkUrl').value='';document.getElementById('linkTitle').value='';
+  save();renderLinks();
+  document.getElementById('hBadgeLinks').textContent=S.links.length+'件';
+}
+function deleteLink(id){S.links=S.links.filter(function(l){return l.id!==id});save();renderLinks();}
+function renderLinks(){
+  var el=document.getElementById('linkList');
+  if(!S.links.length){
+    el.innerHTML='<li style="font-family:var(--mono);font-size:.61rem;color:var(--txD);padding:9px 0">// まだリンクが登録されていません</li>';
+    return;
+  }
+  var html='';
+  S.links.forEach(function(l){
+    var icon=LINK_ICONS[l.tag]||LINK_ICONS.other;
+    var badgeCls='link-tag-badge lt-'+l.tag;
+    html+='<li class="link-item">';
+    html+='<span class="link-icon">'+icon+'</span>';
+    html+='<div class="link-info">';
+    html+='<a class="link-name" href="'+esc(l.url)+'" target="_blank" rel="noopener">'+esc(l.title)+'</a>';
+    html+='<div class="link-url">'+esc(l.url)+'</div>';
+    html+='</div>';
+    html+='<span class="'+badgeCls+'">'+esc(l.tag)+'</span>';
+    html+='<button class="tdel" data-lid="'+l.id+'" onclick="deleteLink(this.dataset.lid)">&#215;</button>';
+    html+='</li>';
+  });
+  el.innerHTML=html;
+}
+
+/* ── PDF VIEWER ── */
+var _pdfBlobUrl = null;
+function openPdfViewer(eid, pi){
+  var ex=S.exams.find(function(e){return e.id===eid});
+  if(!ex||!ex.pdfs||!ex.pdfs[pi]){alert('PDFデータが見つかりません');return;}
+  var p=ex.pdfs[pi];
+  // base64 → Blob → Object URL
+  try{
+    var b64=p.data.split(',')[1];
+    var bin=atob(b64);
+    var buf=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++) buf[i]=bin.charCodeAt(i);
+    var blob=new Blob([buf],{type:'application/pdf'});
+    if(_pdfBlobUrl) URL.revokeObjectURL(_pdfBlobUrl);
+    _pdfBlobUrl=URL.createObjectURL(blob);
+    document.getElementById('pdfTitle').textContent=p.name;
+    document.getElementById('pdfFrame').src=_pdfBlobUrl;
+    document.getElementById('pdfOverlay').classList.add('on');
+  }catch(err){
+    alert('PDFを開けませんでした: '+err.message);
+  }
+}
+function closePdfViewer(){
+  document.getElementById('pdfOverlay').classList.remove('on');
+  document.getElementById('pdfFrame').src='';
+  if(_pdfBlobUrl){URL.revokeObjectURL(_pdfBlobUrl);_pdfBlobUrl=null;}
+}
+
+function saveMemo(){S.memo=document.getElementById('memoTa').value;save()}
+
+/* ── STATS ── */
+function renderWeekChart(){
+  var days=[],mx=1;
+  for(var i=6;i>=0;i--){var ls=S.logs[offK(i)]||[];var m=ls.reduce(function(a,l){return a+l.min},0);days.push({l:dayN7(i),m:m,t:i===0});if(m>mx)mx=m;}
+  document.getElementById('weekChart').innerHTML=days.map(function(d){
+    var h=Math.max(2,Math.round(d.m/mx*88));
+    return'<div class="bcol"><div class="bfill'+(d.t?' today':'')+'" style="height:'+h+'px" title="'+fh(d.m)+'"></div><div class="blbl">'+(d.t?'<b style="color:var(--cy)">'+d.l+'</b>':d.l)+'</div></div>';
+  }).join('');
+}
+function renderStats(){
+  var allM=0,allD=0,allS=0;
+  Object.keys(S.logs).forEach(function(k){var ls=S.logs[k];if(!ls.length)return;allD++;allS+=ls.length;allM+=ls.reduce(function(a,l){return a+l.min},0)});
+  document.getElementById('stAllH').textContent=Math.round(allM/60)+'h';document.getElementById('stDays').textContent=allD;document.getElementById('stSess').textContent=allS;
+  var st=0;for(var i=0;i<365;i++){var x=S.logs[offK(i)]||[];if(x.length)st++;else if(i>0)break}document.getElementById('stStrk').textContent=st;
+  var items=S.books.map(function(b){return{name:b.title,m:b.sessions.reduce(function(a,s){return a+s.min},0)}});
+  var un=0;Object.keys(S.logs).forEach(function(k){S.logs[k].forEach(function(l){if(!l.bookId)un+=l.min})});
+  if(un>0)items.push({name:'(未設定)',m:un});items.sort(function(a,b){return b.m-a.m});
+  var mx=items.length?items[0].m:1;
+  document.getElementById('rankList').innerHTML=items.map(function(it){return'<li class="rank-row"><div class="rname">'+esc(it.name)+'</div><div class="rtrack"><div class="rfill" style="width:'+Math.round(it.m/mx*100)+'%"></div></div><div class="rtime">'+fh(it.m)+'</div></li>';}).join('')||'<li style="font-family:var(--mono);font-size:.6rem;color:var(--txD);padding:7px 0">// no data</li>';
+}
+
+/* ── INIT ── */
+load();tick();setInterval(tick,15000);
+refreshBookSelects();refreshEvBookSelect();
+renderTimerStats();renderTodayLog();setRing(1);
+document.getElementById('goalInp').value=S.goalH;
+addExSubjRow();
+initCal();
+renderHome();
+document.getElementById('tab-home').classList.add('on');
+document.getElementById('memoTa') && (document.getElementById('memoTa').value=S.memo);
+document.getElementById('calOverlay').addEventListener('click',function(e){if(e.target===this)closeCalModal()});
+document.getElementById('logOverlay').addEventListener('click',function(e){if(e.target===this)closeLogModal()});
+document.getElementById('pdfOverlay').addEventListener('click',function(e){if(e.target===this)closePdfViewer()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCalModal();closeLogModal();document.getElementById('lightbox').classList.remove('on');closePdfViewer();}});
+window.addEventListener('beforeunload',function(e){if(S.running){e.preventDefault();e.returnValue=''}});
+window.addEventListener('resize',function(){if(document.getElementById('page-exam').classList.contains('on'))renderExamChart();});
+</script>
+
+</body>
+</html>
