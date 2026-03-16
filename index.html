@@ -1089,14 +1089,34 @@ function renderBooks(){
     else if(b.totalP>0){ppct=Math.min(100,Math.round(tpg/b.totalP*100));plbl='ページ '+tpg+'/'+b.totalP}
     var prog=ppct>0?'<div class="bprog-wrap"><div class="bprog-lbl"><span>PROGRESS</span><span>'+esc(plbl)+'</span></div><div class="btrack"><div class="btrack-fill" style="width:'+ppct+'%"></div></div></div>':'';
     var rhtml=b.sessions.slice(-5).reverse().map(function(s){var pts=[];if(s.prob>0)pts.push(s.prob+'問');if(s.page>0)pts.push(s.page+'p');if(s.note)pts.push(s.note);return'<div class="bslog-item"><span>'+s.date+' '+s.time+'</span><span>'+fh(s.min)+(pts.length?' · '+pts.join(' · '):'')+'</span></div>';}).join('');
-    var photos=b.photos||[];var photoHtml='';
+    var photos=b.photos||[];
+
+    // ヘッダー：1枚目の写真をサムネとして参考書名の左に表示
+    var coverThumb='';
     if(photos.length){
-      photoHtml='<div style="display:flex;gap:5px;flex-wrap:wrap;margin-top:9px;margin-bottom:2px">';
-      photos.slice(0,4).forEach(function(src){photoHtml+='<img src="'+src+'" style="width:56px;height:56px;object-fit:cover;border-radius:2px;border:1px solid var(--bdB);cursor:pointer" onclick="openLB(this.src)">';});
-      if(photos.length>4)photoHtml+='<div style="width:56px;height:56px;background:var(--bg3);border:1px solid var(--bdB);border-radius:2px;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:.62rem;color:var(--txD);cursor:pointer" data-bid="'+b.id+'" onclick="openBookPhotoModal(this.dataset.bid)">+'+(photos.length-4)+'</div>';
+      coverThumb='<img src="'+photos[0]+'" onclick="openLB(this.src);event.stopPropagation()" style="width:42px;height:42px;object-fit:cover;border-radius:2px;border:1px solid var(--bdB);flex-shrink:0;cursor:pointer;transition:opacity .15s" onmouseover="this.style.opacity=\'.75\'" onmouseout="this.style.opacity=\'1\'">';
+    } else {
+      coverThumb='<div data-bid="'+b.id+'" onclick="openBookPhotoModal(this.dataset.bid);event.stopPropagation()" style="width:42px;height:42px;background:var(--bg3);border:1px dashed var(--bdB);border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;color:var(--txD);transition:border-color .15s" onmouseover="this.style.borderColor=\'var(--cy)\'" onmouseout="this.style.borderColor=\'var(--bdB)\'">&#128247;</div>';
+    }
+
+    // ボディ内の写真一覧（全枚数を小さく）
+    var photoHtml='';
+    if(photos.length){
+      photoHtml='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:9px;margin-bottom:2px">';
+      photos.forEach(function(src){
+        photoHtml+='<img src="'+src+'" style="width:48px;height:48px;object-fit:cover;border-radius:2px;border:1px solid var(--bdB);cursor:pointer;transition:opacity .15s" onclick="openLB(this.src)" onmouseover="this.style.opacity=\'.75\'" onmouseout="this.style.opacity=\'1\'">';
+      });
       photoHtml+='</div>';
     }
-    return'<div class="bcard"><div class="bcard-hd"><div class="bcard-title">'+esc(b.title)+'</div>'+(b.subj?'<div class="bcard-tag">'+esc(b.subj)+'</div>':'')+'</div>'
+
+    return'<div class="bcard">'
+      +'<div class="bcard-hd" style="gap:10px">'
+      +coverThumb
+      +'<div style="flex:1;min-width:0">'
+      +'<div class="bcard-title">'+esc(b.title)+'</div>'
+      +(b.subj?'<div class="bcard-tag" style="margin-top:3px;display:inline-block">'+esc(b.subj)+'</div>':'')
+      +'</div>'
+      +'</div>'
       +'<div class="bcard-body"><div class="bstats"><div class="bstat"><div class="bstat-v">'+fh(tm)+'</div><div class="bstat-l">TIME</div></div>'
       +'<div class="bstat"><div class="bstat-v">'+tp+'</div><div class="bstat-l">PROBLEMS</div></div>'
       +'<div class="bstat"><div class="bstat-v">'+tpg+'</div><div class="bstat-l">PAGES</div></div></div>'
@@ -1107,7 +1127,8 @@ function renderBooks(){
       +'<button class="btn bd2" data-bid="'+b.id+'" onclick="openBookPhotoModal(this.dataset.bid)">&#128247;'+(photos.length?' <span style=\'color:var(--cy);font-family:var(--mono);font-size:.6rem\'>'+photos.length+'</span>':'')+'</button>'
       +'<button class="btn bdanger" data-bid="'+b.id+'" onclick="deleteBook(this.dataset.bid)" style="margin-left:auto">&#215; 削除</button>'
       +'</div>'
-      +photoHtml+(rhtml?'<div class="bslog">'+rhtml+'</div>':'')
+      +photoHtml
+      +(rhtml?'<div class="bslog">'+rhtml+'</div>':'')
       +'</div></div>';
   }).join('');
 }
