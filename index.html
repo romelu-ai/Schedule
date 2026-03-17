@@ -1099,15 +1099,7 @@ function renderBooks(){
       coverThumb='<div data-bid="'+b.id+'" onclick="openBookPhotoModal(this.dataset.bid);event.stopPropagation()" style="width:42px;height:42px;background:var(--bg3);border:1px dashed var(--bdB);border-radius:2px;flex-shrink:0;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:.9rem;color:var(--txD);transition:border-color .15s" onmouseover="this.style.borderColor=\'var(--cy)\'" onmouseout="this.style.borderColor=\'var(--bdB)\'">&#128247;</div>';
     }
 
-    // ボディ内の写真一覧（全枚数を小さく）
     var photoHtml='';
-    if(photos.length){
-      photoHtml='<div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:9px;margin-bottom:2px">';
-      photos.forEach(function(src){
-        photoHtml+='<img src="'+src+'" style="width:48px;height:48px;object-fit:cover;border-radius:2px;border:1px solid var(--bdB);cursor:pointer;transition:opacity .15s" onclick="openLB(this.src)" onmouseover="this.style.opacity=\'.75\'" onmouseout="this.style.opacity=\'1\'">';
-      });
-      photoHtml+='</div>';
-    }
 
     return'<div class="bcard">'
       +'<div class="bcard-hd" style="gap:10px">'
