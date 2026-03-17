@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+　<!DOCTYPE html>
 
 <html lang="ja">
 <head>
@@ -595,7 +595,45 @@ select.inp{cursor:pointer}
       </div>
     </div>
   </div>
-  <div class="card"><div class="stitle">BOOKS — TIME RANKING</div><ul class="rank-list" id="rankList"></ul></div>
+  <div class="card" style="margin-bottom:14px"><div class="stitle">BOOKS — TIME RANKING</div><ul class="rank-list" id="rankList"></ul></div>
+
+  <!-- ログ編集カード -->
+
+  <div class="card">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;flex-wrap:wrap;gap:8px">
+      <div class="stitle" style="margin:0">SESSION LOG — EDIT</div>
+      <div style="display:flex;align-items:center;gap:7px;flex-wrap:wrap">
+        <div class="flbl" style="margin:0">日付:</div>
+        <input type="date" class="inp" id="logEditDatePicker" style="width:140px" onchange="renderLogEditList()">
+        <button class="btn bd2" onclick="logEditToday()" style="padding:4px 10px;font-size:.58rem">TODAY</button>
+      </div>
+    </div>
+    <div id="logEditList"></div>
+  </div>
+</div>
+
+<!-- SESSION EDIT MODAL -->
+
+<div class="overlay" id="sessEditOverlay">
+  <div class="modal" style="width:380px">
+    <div class="modal-title">&#9998; セッションを編集</div>
+    <input type="hidden" id="sessEditDate">
+    <input type="hidden" id="sessEditIdx">
+    <div class="mrow">
+      <div class="flbl">参考書</div>
+      <select class="inp" id="sessEditBook"></select>
+    </div>
+    <div class="g2" style="margin-bottom:9px">
+      <div><div class="flbl">時間（分）*</div><input class="inp" type="number" id="sessEditMin" min="1"></div>
+      <div><div class="flbl">問題数</div><input class="inp" type="number" id="sessEditProb" min="0"></div>
+    </div>
+    <div class="mrow"><div class="flbl">時刻</div><input class="inp" type="time" id="sessEditTime"></div>
+    <div class="mactions">
+      <button class="btn bdanger" onclick="deleteSessFromModal()" style="margin-right:auto">&#215; 削除</button>
+      <button class="btn bd2" onclick="closeSessEditModal()">CANCEL</button>
+      <button class="btn bc" onclick="saveSessEdit()">&#10003; 保存</button>
+    </div>
+  </div>
 </div>
 
 <!-- OTHER -->
@@ -796,7 +834,7 @@ function getBook(id){return S.books.find(function(b){return String(b.id)===Strin
 function bookName(id){var b=getBook(id);return b?b.title:'(未設定)'}
 
 function save(){
-  var exLite=S.exams.map(function(e){return{id:e.id,name:e.name,series:e.series||'',date:e.date,total:e.total,hensachi:e.hensachi,rank:e.rank,note:e.note,subjs:e.subjs,imgs:[]}});
+  var exLite=S.exams.map(function(e){return{id:e.id,name:e.name,series:e.series||'',date:e.date,total:e.total,hensachi:e.hensachi,rank:e.rank,schoolRank:e.schoolRank||'',note:e.note,subjs:e.subjs,links:e.links||[],imgs:[]}});
   try{localStorage.setItem('sos5',JSON.stringify({books:S.books,logs:S.logs,events:S.events,goalH:S.goalH,exams:exLite,links:S.links,memo:S.memo}));}catch(e){}
   S.exams.forEach(function(e){
     if(e.imgs&&e.imgs.length){try{localStorage.setItem('sos5i_'+e.id,JSON.stringify(e.imgs));}catch(err){}}
@@ -831,7 +869,7 @@ function goPage(id){
   if(id==='books')renderBooks();
   if(id==='cal')renderCal();
   if(id==='exam'){renderExamList();renderExamChart()}
-  if(id==='stats'){renderStats();renderWeekChart()}
+  if(id==='stats'){renderStats();renderWeekChart();logEditToday()}
   if(id==='other'){renderLinks();renderBackupInfo();var mt=document.getElementById('memoTa');if(mt)mt.value=S.memo;}
 }
 
@@ -1378,7 +1416,7 @@ function buildViewModeTabs(){
 function buildChartMetricTabs(){
   var el=document.getElementById('chartTabs');
   var tabs=[{key:'total',label:'合計点'},{key:'hensachi',label:'偏差値'}];
-  getAllSubjNames().forEach(function(n){tabs.push({key:'s:'+n,label:n});});
+  getAllSubjNames().forEach(function(n){tabs.push({key:'s:'+n,label:n+'（偏差値）'});});
   el.innerHTML=tabs.map(function(t){
     return '<div class="chart-tab'+(chartMetric===t.key?' on':'')+'" data-metric="'+esc(t.key)+'">'+esc(t.label)+'</div>';
   }).join('');
@@ -1531,7 +1569,7 @@ function drawExamChart(){
 function getMetricVal(exam, metric){
   if(metric==='total') return exam.total!=null?exam.total:null;
   if(metric==='hensachi') return exam.hensachi!=null?exam.hensachi:null;
-  if(metric.slice(0,2)==='s:'){var n=metric.slice(2);var sub=(exam.subjs||[]).find(function(s){return s.name===n});return sub?sub.score:null;}
+  if(metric.slice(0,2)==='s:'){var n=metric.slice(2);var sub=(exam.subjs||[]).find(function(s){return s.name===n});return (sub&&sub.hensachi!=null)?sub.hensachi:null;}
   return null;
 }
 
@@ -1553,6 +1591,119 @@ function openPdfViewer(eid,pi){var ex=S.exams.find(function(e){return e.id===eid
 function closePdfViewer(){document.getElementById('pdfOverlay').classList.remove('on');document.getElementById('pdfFrame').src='';if(_pdfBlobUrl){URL.revokeObjectURL(_pdfBlobUrl);_pdfBlobUrl=null;}}
 
 function saveMemo(){S.memo=document.getElementById('memoTa').value;save()}
+
+/* ── STATS LOG EDIT ── */
+function logEditToday(){
+  var el=document.getElementById('logEditDatePicker');
+  if(el){el.value=todayK();renderLogEditList();}
+}
+function renderLogEditList(){
+  var dk=document.getElementById('logEditDatePicker').value;
+  var el=document.getElementById('logEditList');
+  if(!dk){el.innerHTML='<div style="font-family:var(--mono);font-size:.61rem;color:var(--txD);padding:8px 0">// 日付を選択してください</div>';return;}
+  var ls=S.logs[dk]||[];
+  if(!ls.length){el.innerHTML='<div style="font-family:var(--mono);font-size:.61rem;color:var(--txD);padding:8px 0">// この日のセッションはありません</div>';return;}
+  // 日ごと合計
+  var total=ls.reduce(function(a,l){return a+l.min},0);
+  var html='<div style="font-family:var(--mono);font-size:.58rem;color:var(--txD);margin-bottom:8px">'
+    +'合計: <span style="color:var(--cy)">'+fh(total)+'</span>　'
+    +ls.length+'セッション</div>';
+  html+='<div style="display:flex;flex-direction:column;gap:4px">';
+  ls.forEach(function(l,i){
+    var bname=bookName(l.bookId);
+    html+='<div style="display:flex;align-items:center;gap:8px;background:var(--bg2);border:1px solid var(--bd);border-radius:3px;padding:7px 10px">'
+      +'<div style="font-family:var(--mono);font-size:.6rem;color:var(--txD);flex-shrink:0;width:42px">'+esc(l.time||'--:--')+'</div>'
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-family:var(--mono);font-size:.65rem;color:var(--cy);white-space:nowrap;overflow:hidden;text-overflow:ellipsis">'+esc(bname)+'</div>'
+      +'<div style="font-family:var(--mono);font-size:.58rem;color:var(--txD);margin-top:2px">'
+      +fh(l.min)+(l.prob?' · '+l.prob+'問':'')
+      +'</div></div>'
+      +'<button class="btn bd2" data-dk="'+dk+'" data-idx="'+i+'" onclick="openSessEditModal(this.dataset.dk,this.dataset.idx)" style="padding:3px 10px;font-size:.58rem">&#9998; 編集</button>'
+      +'</div>';
+  });
+  html+='</div>';
+  el.innerHTML=html;
+}
+function openSessEditModal(dk,idx){
+  var ls=S.logs[dk]||[];
+  var l=ls[parseInt(idx)];if(!l)return;
+  document.getElementById('sessEditDate').value=dk;
+  document.getElementById('sessEditIdx').value=idx;
+  document.getElementById('sessEditMin').value=l.min||'';
+  document.getElementById('sessEditProb').value=l.prob||0;
+  document.getElementById('sessEditTime').value=l.time||'';
+  // 参考書セレクト
+  var opts='<option value="">-- 未設定 --</option>'+S.books.map(function(b){return'<option value="'+b.id+'"'+(String(l.bookId)===String(b.id)?' selected':'')+'>'+esc(b.title)+'</option>';}).join('');
+  document.getElementById('sessEditBook').innerHTML=opts;
+  document.getElementById('sessEditOverlay').classList.add('on');
+}
+function closeSessEditModal(){document.getElementById('sessEditOverlay').classList.remove('on');}
+function saveSessEdit(){
+  var dk=document.getElementById('sessEditDate').value;
+  var idx=parseInt(document.getElementById('sessEditIdx').value);
+  var mins=parseInt(document.getElementById('sessEditMin').value)||0;
+  if(mins<1){alert('時間を入力してください');return;}
+  var ls=S.logs[dk]||[];
+  var old=ls[idx];if(!old)return;
+  var newBookId=document.getElementById('sessEditBook').value||null;
+  var newProb=parseInt(document.getElementById('sessEditProb').value)||0;
+  var newTime=document.getElementById('sessEditTime').value||old.time||'';
+  // --- S.logs 更新 ---
+  ls[idx]=Object.assign({},old,{bookId:newBookId,min:mins,prob:newProb,time:newTime});
+  // --- S.books.sessions 同期 ---
+  // 旧bookIdのsessionsから該当エントリを修正
+  syncBookSession(dk,idx,old,ls[idx]);
+  save();closeSessEditModal();
+  renderLogEditList();renderStats();renderWeekChart();renderTimerStats();renderTodayLog();
+  if(document.getElementById('page-books').classList.contains('on'))renderBooks();
+}
+function deleteSessFromModal(){
+  var dk=document.getElementById('sessEditDate').value;
+  var idx=parseInt(document.getElementById('sessEditIdx').value);
+  if(!confirm('このセッションを削除しますか？'))return;
+  var ls=S.logs[dk]||[];
+  var old=ls[idx];
+  // S.books.sessions から対応エントリを削除
+  removeBookSession(dk,idx,old);
+  ls.splice(idx,1);
+  if(!ls.length)delete S.logs[dk];else S.logs[dk]=ls;
+  save();closeSessEditModal();
+  renderLogEditList();renderStats();renderWeekChart();renderTimerStats();renderTodayLog();
+  if(document.getElementById('page-books').classList.contains('on'))renderBooks();
+}
+// S.logs[dk][idx] に対応する S.books[].sessions エントリを更新
+function syncBookSession(dk,idx,oldLog,newLog){
+  // 旧bookIdから除去→新bookIdに追加
+  if(oldLog.bookId){
+    var ob=getBook(oldLog.bookId);
+    if(ob&&ob.sessions){
+      // 同じ日・同じインデックス順で特定するのが難しいため時刻で近似マッチ
+      var si=ob.sessions.findIndex(function(s){return s.date===dk&&s.time===(oldLog.time||'');});
+      if(si>=0){
+        if(newLog.bookId&&newLog.bookId===oldLog.bookId){
+          // 同じ参考書 → in-place更新
+          ob.sessions[si]=Object.assign({},ob.sessions[si],{min:newLog.min,prob:newLog.prob,time:newLog.time});
+        }else{
+          ob.sessions.splice(si,1);
+        }
+      }
+    }
+  }
+  if(newLog.bookId&&newLog.bookId!==oldLog.bookId){
+    var nb=getBook(newLog.bookId);
+    if(nb){
+      nb.sessions=nb.sessions||[];
+      nb.sessions.push({date:dk,min:newLog.min,prob:newLog.prob,page:0,note:'',time:newLog.time});
+    }
+  }
+}
+function removeBookSession(dk,idx,oldLog){
+  if(!oldLog.bookId)return;
+  var ob=getBook(oldLog.bookId);
+  if(!ob||!ob.sessions)return;
+  var si=ob.sessions.findIndex(function(s){return s.date===dk&&s.time===(oldLog.time||'');});
+  if(si>=0)ob.sessions.splice(si,1);
+}
 
 /* ── STATS ── */
 function renderWeekChart(){
@@ -1586,7 +1737,8 @@ document.getElementById('calOverlay').addEventListener('click',function(e){if(e.
 document.getElementById('logOverlay').addEventListener('click',function(e){if(e.target===this)closeLogModal()});
 document.getElementById('bookPhotoOverlay').addEventListener('click',function(e){if(e.target===this)closeBookPhotoModal()});
 document.getElementById('pdfOverlay').addEventListener('click',function(e){if(e.target===this)closePdfViewer()});
-document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCalModal();closeLogModal();closeBookPhotoModal();document.getElementById('lightbox').classList.remove('on');closePdfViewer();}});
+document.getElementById('sessEditOverlay').addEventListener('click',function(e){if(e.target===this)closeSessEditModal()});
+document.addEventListener('keydown',function(e){if(e.key==='Escape'){closeCalModal();closeLogModal();closeBookPhotoModal();closeSessEditModal();document.getElementById('lightbox').classList.remove('on');closePdfViewer();}});
 window.addEventListener('beforeunload',function(e){if(S.running){e.preventDefault();e.returnValue=''}});
 window.addEventListener('resize',function(){if(document.getElementById('page-exam').classList.contains('on'))renderExamChart();});
 </script>
